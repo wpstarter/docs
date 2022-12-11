@@ -1,2 +1,0 @@
-# docs
-The WpStarter documentation.
