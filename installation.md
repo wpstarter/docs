@@ -2,7 +2,7 @@
 
 - [Meet WpStarter](#meet-wp-starter)
     - [Why WpStarter?](#why-wp-starter)
-- [Your First Laravel Project](#your-first-laravel-project)
+- [Your First WpStarter Project](#your-first-wp-starter-project)
     - [Installation Via Composer](#installation-via-composer)
 - [Initial Configuration](#initial-configuration)
     - [Environment Based Configuration](#environment-based-configuration)
