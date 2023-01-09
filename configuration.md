@@ -36,11 +36,11 @@ Your `.env` file should not be committed to your application's source control, s
 
 As our application put inside WordPress that mean .env may be accessed via url. WpStarter comes with .htaccess out of the box to help protect .env on apache. If you are using nginx please add following rule
 
-```nginx
-location ~ /\.env* {
-  deny all;
-}
-```
+
+    location ~ /\.env* {
+      deny all;
+    }
+
 
 <a name="additional-environment-files"></a>
 #### Additional Environment Files
