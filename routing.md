@@ -107,5 +107,9 @@ You can set some more attributes like menu title, page title, menu position or c
         ->capability('edit_posts');
 
 ### Controller methods
+We map url to controller method by query param `action` or `action2`
 
+Dispatch method  will be {requestMethod}_{action} in camel case e.g. `/wp-admin/admin.php?page=ws-admin-sample&action=foo-bar` will call method `getFooBar` or `postFooBar`
+
+Default action is `index`, if you do not pass any action `getIndex` and `postIndex` will be called. 
 
