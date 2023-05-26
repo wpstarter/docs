@@ -8,6 +8,7 @@
     - [Routing](/docs/{{version}}/routing)
     - [Controllers](/docs/{{version}}/controllers)
     - [Views](/docs/{{version}}/views)
+    - [Livewire](/docs/{{version}}/livewire)
     
 
 
