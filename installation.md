@@ -20,7 +20,7 @@ WpStarter strives to provide an amazing developer experience, all powerful of La
 <a name="why-wp-starter"></a>
 ### Why WpStarter?
 
-There are a variety of tools and frameworks available to you when building a web application. 
+There are a variety of tools and frameworks available to you when building a web application.
 We keep all Laravel stuffs and integrate them with WordPress like Eloquent using $wpdb, Laravel Mail send via wp_mail,...
 All Laravel classes available under `WpStarter` namespace, all Laravel helpers available under `ws_` prefix
 
@@ -37,6 +37,13 @@ Then you may create WpStarter project with composer. After the application has b
 
     composer create-project "wpstarter/wpstarter:^1.*" example-plugin
 
+Additionally, during the development phase, you may want to install the package `fakerphp/faker` to generate fake data. This package is required when using features like `seed`, such as when running `php artisan migrate:fresh --seed`. To install it, run the following command:
+
+```shell
+cd example-plugin
+composer require fakerphp/faker --dev
+```
+
 ### Installation within WordPress root directory
 
 WpStarter can be placed outside `plugins` directory. It's highly recommend to put it inside WordPress root and load it via a `mu-plugin`.
@@ -51,9 +58,6 @@ You can move WpStarter to WordPress's root directory by create a mu plugin `wp-c
 require ABSPATH.'/example-plugin/main.php';
 
 ```
-
-
-
 
 <a name="initial-configuration"></a>
 ## Initial Configuration
@@ -86,7 +90,3 @@ Now that you have created your WpStarter project, you may be wondering what to l
 - [Facades](/docs/{{version}}/facades)
 
 </div>
-
-
-
-
