@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "sass-embedded": "^1.100.0",
+    "vitepress": "^2.0.0-alpha.20"
+  },
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "npm run docs:build",
+    "docs:build": "vitepress build docs && npm run docs:check",
+    "preview": "vitepress preview docs",
+    "docs:check": "node scripts/check-docs.mjs"
+  },
+  "name": "wpstarter-docs",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

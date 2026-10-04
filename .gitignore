@@ -1,0 +1,6 @@
+.idea
+node_modules
+references
+maintainers
+docs/.vitepress/dist
+docs/.vitepress/cache
