@@ -2,7 +2,7 @@
 
 - [What needs to change](#what-needs-to-change)
 - [Update PHP and Composer dependencies](#dependencies)
-- [Update the application user class](#user-class)
+- [Replace the removed user class if still used](#user-class)
 - [Keep WordPress routes loaded](#route-registration)
 - [Check application-specific compatibility](#application-compatibility)
 - [Clear caches and verify](#verification)
@@ -10,9 +10,9 @@
 
 ## What needs to change {#what-needs-to-change}
 
-WpStarter 1.x uses a Laravel 8.x foundation; 2.x uses Laravel 12. For an application using the standard WordPress integration, the main application changes are upgrading `wpstarter/framework` and replacing the old `WpStarter\Wordpress\User` base class with `WpStarter\Wordpress\Auth\User`, if it is still used.
+WpStarter 1.x uses a Laravel 8.x foundation; 2.x uses Laravel 12. Start by upgrading `wpstarter/framework` and checking the PHP and dependency requirements. Framework 2.x has removed `WpStarter\Wordpress\User`; replace it with `WpStarter\Wordpress\Auth\User` only if your application still uses that old class. Most applications need no user class change, because the 1.x skeleton adopted `Auth\User` early in its development.
 
-This is the starting point, not a guarantee that every Laravel 8.x-era application or dependency needs only those two edits. PHP must meet the new requirements, custom framework extensions must match the new APIs, and optional packages must support WpStarter 2.x.
+Custom framework extensions must match the new APIs, and optional packages must support WpStarter 2.x. Review the application-specific compatibility guidance below for the features your application uses.
 
 The inspected 2.x skeleton retains the WordPress entrypoint, explicit kernel bindings in `bootstrap/app.php`, application providers, and separate frontend/admin kernels. You do not need to adopt a standalone Laravel application's new bootstrap structure to upgrade this skeleton. Keep the existing application configuration, routes, and data.
 
@@ -33,7 +33,7 @@ Update your application's `composer.json`. The inspected 2.x skeleton uses:
 }
 ```
 
-Merge these constraints into the existing file; retain the application's other dependencies, autoload mappings, and scripts. Change the user class below before running Composer, because post-update scripts may bootstrap the application.
+Merge these constraints into the existing file; retain the application's other dependencies, autoload mappings, and scripts. If your application still uses the removed user class, update it as shown below before running Composer, because post-update scripts may bootstrap the application.
 
 ```shell
 composer update wpstarter/framework --with-all-dependencies
@@ -43,9 +43,11 @@ composer show wpstarter/framework
 
 If Composer reports a conflicting package, inspect its WpStarter/PHP constraints and select a compatible version. Review development tools and optional integrations as well as production dependencies. Commit the resulting lockfile and use `composer install` on deployment hosts.
 
-## Update the application user class {#user-class}
+## Replace the removed user class if still used {#user-class}
 
-Older applications may extend the former compatibility class:
+Framework 2.x has removed `WpStarter\Wordpress\User`. This affects only applications that still extend or reference that class. The 1.x skeleton has used `WpStarter\Wordpress\Auth\User` for years, so this change is rarely needed.
+
+If your application still has:
 
 ```php
 namespace App\Models;
@@ -55,7 +57,7 @@ class User extends \WpStarter\Wordpress\User
 }
 ```
 
-Use the authentication model in 2.x:
+replace it with:
 
 ```php
 namespace App\Models;
@@ -67,9 +69,7 @@ class User extends \WpStarter\Wordpress\Auth\User
 
 Update imports and type hints that refer to the old class. Keep `config/auth.php` pointing to `App\Models\User` and retain the `wp` guard/provider when using WordPress login cookies. This changes the PHP base class; it does not require migrating WordPress accounts or replacing their passwords.
 
-The supplied 1.x reference (v1.10.1) already extends `Auth\User`, so applications using that model need no namespace edit. The old `Wordpress\User` alias is absent in 2.x. `findBy()` remains available on the new model; there is no need to carry over the old `WpUserQuery` trait solely for that method.
-
-If you override user model methods, compare their signatures and behavior with the 2.x model. The authentication model returns `user_pass` from `getAuthPasswordName()` and preserves the WordPress authentication contract.
+If your application already extends `WpStarter\Wordpress\Auth\User`, no change is needed here.
 
 ## Keep WordPress routes loaded {#route-registration}
 
@@ -100,8 +100,6 @@ Pay particular attention to:
 - Custom filesystem adapters, logging integrations, and date calculations: the inspected package uses Flysystem 3, Monolog 3, and Carbon 3.
 - Methods that implement framework contracts or override framework classes: update signatures and return types where required.
 - Optional packages such as Livewire: choose a version whose Composer requirements support WpStarter 2.x. A package targeting `Illuminate` APIs is not automatically compatible with the port.
-
-WordPress authentication should continue through the `wp` guard. The WordPress provider's `rehashPasswordIfRequired()` is currently empty; if you deliberately combine it with a framework session guard, automatic password rehashing is not supplied by that method.
 
 ## Clear caches and verify {#verification}
 

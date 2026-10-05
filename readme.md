@@ -33,6 +33,8 @@ Use relative Markdown links inside a version, such as `./routing.md#wordpress-ro
 
 The version switcher opens the same article in the target version if it exists, preserving the query string and fragment. Otherwise it opens that version's overview and drops the article fragment. Every page in an older version displays a warning suggesting a project upgrade.
 
+Local search on the homepage searches only the preferred (latest) documentation version. Within documentation, search results stay in the version currently being viewed, including after switching versions.
+
 ## Why native VitePress routing?
 
 The requested layout is a shared product homepage plus explicit URLs for every documentation version. VitePress's file-based routing and multiple sidebars fit this directly.
