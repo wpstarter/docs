@@ -8,7 +8,7 @@ WpStarter provides a bridge for loading Livewire assets through WordPress. Compo
 composer require wpstarter/livewire
 ```
 
-Check the installed package version and its dependency constraints before following upstream examples. Do not assume APIs from the newest Livewire release apply to this Laravel 8.x-based application.
+Check the installed package version and its dependency constraints before following upstream examples. Choose a release compatible with WpStarter 2.x; an old integration package intended for the Laravel 8.x-based framework may prevent the Composer upgrade. Do not assume APIs from the newest Livewire release apply to the package you installed.
 
 ## Theme-rendered frontend pages
 

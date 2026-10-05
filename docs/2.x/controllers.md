@@ -17,7 +17,7 @@ use WpStarter\Wordpress\Facades\Route;
 Route::get('catalog', [CatalogController::class, 'show']);
 ```
 
-For the general controller API, dependency injection, and invokable controllers, use [Laravel 8.x's controller documentation](https://laravel.com/docs/8.x/controllers), replacing `Illuminate` imports with `WpStarter`. This page covers WordPress input and response behavior. Admin controllers extend a different base class; see [admin controllers](./admin.md#controllers-and-actions).
+For the general controller API, dependency injection, and invokable controllers, use [Laravel 12.x's controller documentation](https://laravel.com/docs/12.x/controllers), replacing `Illuminate` imports with `WpStarter`. This page covers WordPress input and response behavior. Admin controllers extend a different base class; see [admin controllers](./admin.md#controllers-and-actions).
 
 ## Controller parameters {#controller-parameters}
 
@@ -172,4 +172,4 @@ Pass-through does not ask the router to try its next route. If the matched short
 
 Frontend controller middleware follows the usual controller API, including `only()` and `except()` for explicitly routed methods. Route middleware can also return any response in the table above and short-circuit the controller.
 
-Admin controllers registered as a class dispatch through `__invoke`, then choose a method from the request. Their method-specific middleware has a limitation in this version; use the [admin middleware guidance](./admin.md#middleware-and-capabilities).
+Admin controllers registered as a class resolve their request-specific action before middleware selection. `only()` and `except()` filter against that action, such as `postSave`; see [admin middleware guidance](./admin.md#middleware-and-capabilities).

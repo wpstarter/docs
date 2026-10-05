@@ -5,7 +5,9 @@
 - [Initial configuration](#initial-configuration)
 - [Try the supplied examples](#try-the-supplied-examples)
 
-WpStarter runs an application inside WordPress. Its framework uses Laravel-style APIs under the `WpStarter` namespace and integrates routing, views, authentication, database access, and mail with WordPress. These docs focus on that integration. For shared framework concepts, use the Laravel 8.x documentation.
+WpStarter runs an application inside WordPress. Its framework uses Laravel-style APIs under the `WpStarter` namespace and integrates routing, views, authentication, database access, and mail with WordPress. These docs focus on that integration. For shared framework concepts, use the Laravel 12.x documentation.
+
+Already using 1.x? Follow the [upgrade guide](./upgrade.md) rather than creating another application.
 
 ## Install the plugin skeleton {#installation-via-composer}
 
@@ -13,10 +15,12 @@ Install into your WordPress plugins directory:
 
 ```shell
 cd /path/to/wordpress/wp-content/plugins
-composer create-project "wpstarter/wpstarter:1.*" example-plugin
+composer create-project "wpstarter/wpstarter:2.*" example-plugin
 ```
 
-The inspected skeleton requires `wpstarter/framework:^1.6.1`, and its lockfile resolves `v1.10.0`. Use its Composer requirements and lockfile to determine the PHP version and extensions for your deployment. Composer's install scripts create `.env` and generate the application key; verify that `APP_KEY` is populated.
+The `2.*` constraint selects the latest compatible stable 2.x skeleton release. It is equivalent to `^2.0` and avoids caret escaping issues when invoking Composer through a Windows batch file. The skeleton and `wpstarter/framework` have separate release versions.
+
+The inspected skeleton requires PHP 8.2 or later and `wpstarter/framework:^2.1`; its lockfile resolves `v2.1.4`. Use its Composer requirements and lockfile to determine the required extensions for your deployment, and run `composer check-platform-reqs`. Composer's install scripts create `.env` and generate the application key; verify that `APP_KEY` is populated.
 
 Update the plugin header in `main.php` for your application, then activate it in WordPress. The project must be able to load an installed WordPress instance. Its CLI bootstrap searches for `wp-load.php` relative to the project and supports the plugin-directory and WordPress-root layouts described here.
 
@@ -44,6 +48,8 @@ require ABSPATH.'example-plugin/main.php';
 This loads the application as a must-use plugin. The entrypoint guards against loading another copy through `__WS_FILE__`; plan for one WpStarter application entrypoint per WordPress installation with this skeleton.
 
 ## Initial configuration {#initial-configuration}
+
+The skeleton supplies Vite configuration. See [asset bundling](./assets.md) for the entry files, Blade directive, and production build. Laravel Mix remains supported in 2.x.
 
 Review [WordPress configuration](./configuration.md), especially:
 

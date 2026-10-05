@@ -31,6 +31,8 @@ export default defineConfig({
   },
   transformPageData(page) {
     const version = publishedVersions.find(version => page.relativePath.startsWith(version.id + '/'))
-    if (version) page.title += ' · ' + version.label
+    if (version && version.id !== preferred.id) {
+      page.frontmatter.legacyVersion = version.label
+    }
   }
 })

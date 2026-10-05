@@ -9,7 +9,7 @@
 
 ## Application configuration {#introduction}
 
-WpStarter uses `config/*.php`, `.env`, and the Laravel-style configuration API. Read [Laravel 8.x configuration](https://laravel.com/docs/8.x/configuration) for environment types, configuration lookup, and caching. In WpStarter, use `ws_env()`, `ws_config()`, and `WpStarter\Support\Facades\Config`.
+WpStarter uses `config/*.php`, `.env`, and the Laravel-style configuration API. Read [Laravel 12.x configuration](https://laravel.com/docs/12.x/configuration) for environment types, configuration lookup, and caching. In WpStarter, use `ws_env()`, `ws_config()`, and `WpStarter\Support\Facades\Config`.
 
 This chapter describes values that interact with the surrounding WordPress application. The supplied config files are the source of truth for your installed skeleton.
 
@@ -47,7 +47,7 @@ The example environment still contains generic `DB_*` values; they do not overri
 
 Use `current_user_can()` for WordPress capabilities. A logged-in guard check does not imply permission to manage a particular resource. See [admin authorization](./admin.md#middleware-and-capabilities).
 
-For mail templates and the normal database/query APIs, refer to the corresponding Laravel 8.x documentation and adapt namespaces/helpers. These docs do not repeat those APIs.
+For mail templates and the normal database/query APIs, refer to the corresponding Laravel 12.x documentation and adapt namespaces/helpers. These docs do not repeat those APIs.
 
 ## URLs, assets, locale, and time {#urls-assets-locale-and-time}
 
@@ -77,7 +77,9 @@ php artisan config:cache
 
 WordPress-derived values such as table prefixes, URLs, and locale can become fixed in the cache. Do not copy a cache built against a different site's database or URL. Use `php artisan config:clear` when those values change.
 
-Frontend URL route caching does not include the separate shortcode and admin route collections in this implementation. More critically, the supplied provider loads shortcode routes inside the callback that is skipped when URL routes are cached. Avoid `route:cache` with this provider until shortcode registration is moved outside that branch; use `route:clear` if shortcode pages stop dispatching after enabling the cache. Admin routes are registered separately by their own provider.
+`route:cache` caches frontend URL routes only. The supplied 2.x provider loads `routes/wp.php` outside the URL route callback, so shortcode routes are registered even when URL routes are cached. Admin routes are registered separately by their own provider. Shortcode and admin routes remain runtime collections; their WordPress matching is not part of the compiled URL cache.
+
+If an older application still loads `routes/wp.php` inside `$this->routes(...)`, move it outside that callback before enabling URL route caching; see [upgrading route registration](./upgrade.md#route-registration). Build the cache in the target WordPress environment and verify URL, shortcode, and admin pages afterwards.
 
 Ensure session/cache directories remain writable. For a WordPress-root installation served by Nginx, adapt the provided access rules as described in [installation](./installation.md#initial-configuration).
 

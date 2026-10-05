@@ -7,8 +7,8 @@ hero:
   tagline: Laravel-style application APIs, with routing, views, and administration designed around WordPress.
   actions:
     - theme: brand
-      text: Read the 1.x docs
-      link: /1.x/
+      text: Getting Started
+      link: /2.x/
     - theme: alt
       text: Framework on GitHub
       link: https://github.com/wpstarter/framework
@@ -21,5 +21,3 @@ features:
   - title: Build WordPress admin screens
     details: Register menus, dispatch controller actions, and use forms, layouts, and notices inside the admin shell.
 ---
-
-<DocumentationVersions />

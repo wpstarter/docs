@@ -8,7 +8,7 @@
 
 ## Choose a rendering boundary {#choose-a-rendering-boundary}
 
-Blade views live in `resources/views`; admin views live in `app/Admin/resources/views`. The Blade syntax and general view API follow [Laravel 8.x's Blade documentation](https://laravel.com/docs/8.x/blade). Use `ws_view()` for a normal view, then choose the response boundary:
+Blade views live in `resources/views`; admin views live in `app/Admin/resources/views`. The Blade syntax and general view API follow [Laravel 12.x's Blade documentation](https://laravel.com/docs/12.x/blade). Use `ws_view()` for a normal view, then choose the response boundary:
 
 | Desired result | Return from a frontend controller |
 | --- | --- |

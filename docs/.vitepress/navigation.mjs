@@ -15,7 +15,7 @@ export function documentationNavigation(root) {
       throw new Error(version.id + ' requires index.md and documentation.md')
     }
 
-    const groups = [{ text: version.label + ' Documentation', link: '/' + version.id + '/' }]
+    const groups = [{ text: 'Documentation', link: '/' + version.id + '/' }]
     let group
     for (const line of readFileSync(join(directory, 'documentation.md'), 'utf8').split(/\r?\n/)) {
       const heading = line.match(/^## (.+)$/)

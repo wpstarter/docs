@@ -37,7 +37,7 @@ Route::get('/greeting/{name}', function ($name) {
 });
 ```
 
-Registration follows the Laravel 8.x routing API: HTTP verbs, groups, names, constraints, and controller actions. Refer to [Laravel's routing documentation](https://laravel.com/docs/8.x/routing) for those APIs. Use the `WpStarter` namespace in place of `Illuminate` and helpers such as `ws_route()`.
+Registration follows the Laravel 12.x routing API: HTTP verbs, groups, names, constraints, and controller actions. Refer to [Laravel's routing documentation](https://laravel.com/docs/12.x/routing) for those APIs. Use the `WpStarter` namespace in place of `Illuminate` and helpers such as `ws_route()`.
 
 **The supplied skeleton does not add an `/api` prefix.** Its `routes/api.php` example explicitly registers `/api/me`. To apply a prefix to the entire file, add `->prefix('api')` to its group in `RouteServiceProvider` and remove `/api` from each route declaration.
 

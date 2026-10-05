@@ -15,11 +15,11 @@ npm run preview
 
 `docs:build` builds the site and checks all generated internal document links and fragments. Dead links remain build errors. `docs:check` repeats the output check without rebuilding.
 
-The output is `docs/.vitepress/dist`. The homepage is `/`, and the current published documentation is `/1.x/`. Source pages such as `docs/1.x/routing.md` become `/1.x/routing`.
+The output is `docs/.vitepress/dist`. The homepage is `/`, the preferred documentation is `/2.x/`, and `/1.x/` remains available. Source pages such as `docs/2.x/routing.md` become `/2.x/routing`.
 
 ## Documentation versions
 
-`docs/.vitepress/versions.mjs` is the version registry. It drives the homepage version cards and the navigation switcher. Keep the preferred version first.
+`docs/.vitepress/versions.mjs` is the version registry. It drives the documentation navigation switcher and legacy-page warnings. Keep the preferred version first. The shared homepage has a Getting Started action and no version selector.
 
 To add a version:
 
@@ -31,7 +31,7 @@ To add a version:
 
 Use relative Markdown links inside a version, such as `./routing.md#wordpress-routes`. They stay within that version when copied. Use explicit heading IDs such as `## URL routes {#basic-routing}` when retaining an existing fragment.
 
-The version switcher opens the same article in the target version if it exists, preserving the query string and fragment. Otherwise it opens that version's overview and drops the article fragment. On the shared homepage, choosing a version opens its overview.
+The version switcher opens the same article in the target version if it exists, preserving the query string and fragment. Otherwise it opens that version's overview and drops the article fragment. Every page in an older version displays a warning suggesting a project upgrade.
 
 ## Why native VitePress routing?
 
@@ -58,7 +58,7 @@ $env:DOCS_BASE = '/docs/'
 npm run docs:build
 ```
 
-Navigation, version cards, assets, and version switching use VitePress's base path. The GitHub Pages workflow reads that prefix from `configure-pages` and builds with it.
+Navigation, assets, and version switching use VitePress's base path. The GitHub Pages workflow reads that prefix from `configure-pages` and builds with it.
 
 Clean URLs require the static host to resolve `/1.x/routing` to `/1.x/routing.html`. VitePress preview and GitHub Pages support this layout; configure equivalent routing on another host.
 

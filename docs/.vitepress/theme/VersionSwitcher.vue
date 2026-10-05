@@ -31,7 +31,7 @@ function changeVersion(event: Event) {
 </script>
 
 <template>
-  <div class="version-switcher" :class="{ 'screen-menu': screenMenu }">
+  <div v-if="selected" class="version-switcher" :class="{ 'screen-menu': screenMenu }">
     <label>
       <span class="label">Version</span>
       <select :value="selected" aria-label="Documentation version" @change="changeVersion">
