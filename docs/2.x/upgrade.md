@@ -14,7 +14,7 @@ WpStarter 1.x uses a Laravel 8.x foundation; 2.x uses Laravel 12. Start by upgra
 
 Custom framework extensions must match the new APIs, and optional packages must support WpStarter 2.x. Review the application-specific compatibility guidance below for the features your application uses.
 
-The inspected 2.x skeleton retains the WordPress entrypoint, explicit kernel bindings in `bootstrap/app.php`, application providers, and separate frontend/admin kernels. You do not need to adopt a standalone Laravel application's new bootstrap structure to upgrade this skeleton. Keep the existing application configuration, routes, and data.
+The 2.x skeleton retains the WordPress entrypoint, explicit kernel bindings in `bootstrap/app.php`, application providers, and separate frontend/admin kernels. You do not need to adopt a standalone Laravel application's new bootstrap structure to upgrade this skeleton. Keep the existing application configuration, routes, and data.
 
 **Vite is recommended, not required.** WpStarter 2.x still supports Laravel Mix, `ws_mix()`, and `public/mix-manifest.json`. You can upgrade the PHP framework first and migrate the asset build separately.
 
@@ -22,13 +22,13 @@ The inspected 2.x skeleton retains the WordPress entrypoint, explicit kernel bin
 
 Use PHP 8.2 or later for both the WordPress web runtime and CLI. Check the extensions required by the framework and your application. Framework 2.x also requires Composer's runtime API `^2.2`.
 
-Update your application's `composer.json`. The inspected 2.x skeleton uses:
+Update your application's `composer.json` to allow the latest compatible 2.x framework release:
 
 ```json
 {
   "require": {
     "php": "^8.2",
-    "wpstarter/framework": "^2.1"
+    "wpstarter/framework": "2.*"
   }
 }
 ```
@@ -97,7 +97,7 @@ Use Laravel's upgrade guides for shared APIs across [9.x](https://laravel.com/do
 Pay particular attention to:
 
 - Custom mail transports and callbacks using `Swift_*`: 2.x uses Symfony Mailer/Mime. The bundled WordPress `wp` transport is already adapted, so ordinary mail templates can continue using `MAIL_MAILER=wp_mail`.
-- Custom filesystem adapters, logging integrations, and date calculations: the inspected package uses Flysystem 3, Monolog 3, and Carbon 3.
+- Custom filesystem adapters, logging integrations, and date calculations: framework 2.x uses Flysystem 3, Monolog 3, and Carbon 3.
 - Methods that implement framework contracts or override framework classes: update signatures and return types where required.
 - Optional packages such as Livewire: choose a version whose Composer requirements support WpStarter 2.x. A package targeting `Illuminate` APIs is not automatically compatible with the port.
 

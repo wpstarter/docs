@@ -18,7 +18,7 @@ For general Vite features, consult [Laravel 12.x asset bundling](https://laravel
 
 ## Install and configure Vite {#vite-configuration}
 
-The inspected skeleton uses Vite 7 and `laravel-vite-plugin` 2. Those packages require Node.js `^20.19.0 || >=22.12.0`; use a supported Node.js release for your build environment. If you select different package majors, check their engine requirements.
+The 2.x skeleton uses Vite 7 and `laravel-vite-plugin` 2. Those packages require Node.js `^20.19.0 || >=22.12.0`; use a supported Node.js release for your build environment. If you select different package majors, check their engine requirements.
 
 For an existing Mix application:
 
@@ -65,7 +65,7 @@ List source entrypoints, not the former Mix output paths such as `public/js/app.
 
 ## Convert JavaScript and environment variables {#javascript}
 
-Vite application source uses ES module imports. Do not copy the old `require()` bootstrap unchanged. The inspected 2.x skeleton still contains that older JavaScript, so update it before using its Vite entrypoint:
+Vite application source uses ES module imports. When migrating an existing application, replace any older `require()` bootstrap before using its Vite entrypoint:
 
 ```js
 // resources/js/app.js

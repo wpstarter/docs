@@ -16,7 +16,7 @@ cd /path/to/wordpress/wp-content/plugins
 composer create-project "wpstarter/wpstarter:1.*" example-plugin
 ```
 
-The inspected skeleton requires `wpstarter/framework:^1.6.1`, and its lockfile resolves `v1.10.0`. Use its Composer requirements and lockfile to determine the PHP version and extensions for your deployment. Composer's install scripts create `.env` and generate the application key; verify that `APP_KEY` is populated.
+The 1.x skeleton uses `wpstarter/framework` 1.x. Use the project's Composer requirements and lockfile to determine the PHP version and extensions for your deployment. Composer's install scripts create `.env` and generate the application key; verify that `APP_KEY` is populated.
 
 Update the plugin header in `main.php` for your application, then activate it in WordPress. The project must be able to load an installed WordPress instance. Its CLI bootstrap searches for `wp-load.php` relative to the project and supports the plugin-directory and WordPress-root layouts described here.
 

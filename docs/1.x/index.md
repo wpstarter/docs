@@ -5,7 +5,7 @@ Build a WordPress application using the WpStarter 1.x framework and plugin skele
 These guides focus on WordPress-specific behavior. For shared application APIs, follow the linked Laravel 8.x documentation and use WpStarter namespaces and helpers.
 
 ::: info Version scope
-These docs were reviewed against framework v1.10.0, which is based on Laravel 8.x. Check your installed Composer version before using examples from a different documentation version.
+These guides cover the latest WpStarter 1.x release, based on Laravel 8.x. Use the documentation for your framework's major version.
 :::
 
 ## Start here
