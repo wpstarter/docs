@@ -24,7 +24,11 @@ export default defineConfig({
       { component: 'VersionSwitcher', props: { versions: publishedVersions } }
     ],
     sidebar,
-    socialLinks: [{ icon: 'github', link: 'https://github.com/wpstarter/framework' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/wpstarter/docs', ariaLabel: 'Documentation on GitHub' }],
+    editLink: {
+      pattern: 'https://github.com/wpstarter/docs/edit/master/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
     footer: {
       message: 'WordPress integration, with Laravel-style application APIs.'
     }
