@@ -138,7 +138,7 @@ The supplied `web` group includes `SubstituteBindings`, so shortcode attributes 
 
 ## Dispatch at a WordPress hook {#dispatch-at-a-wordpress-hook}
 
-WpStarter adds `hook($hook, $priority)` to **URL routes**. It registers a dispatch callback for the hook and restricts matching to that hook's priority:
+WpStarter adds `hook($hook, $priority)` to **URL routes**. With URL route caching disabled, it registers a dispatch callback for the hook and restricts matching to that hook's priority:
 
 ```php
 // routes/web.php
@@ -150,6 +150,8 @@ Route::get('/custom-page', function () {
 ```
 
 Use a hook that has not already fired when routes are booted. The default URL dispatch remains `init:1`; the hook-restricted route waits for its own callback. Choose a nonzero priority in this implementation.
+
+**Route cache limitation:** the compiled URL matcher does not run `HookValidator`. A cached route with `->hook(...)` can therefore match at the default `init:1` dispatch, before its intended hook. Keep URL route caching disabled for applications whose routes depend on this timing, and run `php artisan route:clear` if a cache already exists. Delaying the response body with `wp_view(...)->on(...)` does not fix early controller execution.
 
 Do not rely on `hook()` to reschedule shortcode routes. Their validator list does not include `HookValidator`, and `WordpressStarter` only collects extra dispatch hooks from the URL router. Shortcode routing runs at the WordPress kernel's `$wpHandleHook`, defaulting to `['template_redirect', 1]`.
 

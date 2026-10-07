@@ -23,7 +23,14 @@ The provider automatically saves changes at WordPress `shutdown` by default. Cal
 
 The provider also listens for changes to that option, reloads the repository, and calls `queue:restart` by default. Provider properties `$autoSave` and `$autoRestartQueue` control those behaviors. Queue workers retain their own in-memory state, so a restart is useful when settings change.
 
-**Current limitation:** `forget()` removes an in-memory key without marking a change. A subsequent `save()` with no other changes does not persist that deletion. Do not rely on `forget()`, `unset()`, or array unsetting for persistent removal until this is corrected. Setting a nullable value is supported but keeps the key.
+Remove settings with `forget()`. Deletions mark the repository as changed and are persisted by `save()` or the automatic shutdown save:
+
+```php
+ws_setting()->forget('sample.name', 'sample.enabled');
+ws_setting()->save();
+```
+
+`unset($settings->key)` and `unset($settings['key'])` also remove keys. Setting a key to `null` removes it; the repository does not retain a stored null value. `reload()` reads the option again and discards pending in-memory changes.
 
 Use `ws_config()` for deployment configuration and `ws_setting()` for editable WordPress options. The repository is not a WordPress Settings API form registration system.
 
@@ -63,6 +70,8 @@ WordPress hooks must actually print the resources. Theme-preserving responses us
 
 Use explicit version arguments for predictable cache invalidation. The manager resolves sources through `ws_asset()`; generated URLs depend on `app.asset_url`.
 
+See [Resource Manager](./resources.md) for configuration, existing handles, deferred localization data, JavaScript translations, and the browser callback queue.
+
 ## Translation {#translation}
 
 The skeleton loads a WordPress text domain in `AppServiceProvider::boot()`:
@@ -86,4 +95,4 @@ $text = L10n::_n('One item', '%s items', $count);
 
 The first loaded domain becomes the facade's default unless you set another with `L10n::setDefaultDomain()`. Escape translated text according to where it is rendered.
 
-Laravel-style translation files and `ws_trans()` remain separate from WordPress `.mo` files. Use the Laravel documentation for that translation API; use the WordPress domain integration when sharing translations with WordPress code.
+Laravel-style translation files use `ws_trans()` or `ws___()` and remain separate from WordPress `.mo` files. The global `__()` function belongs to WordPress; `ws___()` is the framework equivalent of Laravel's `__()` helper. Use the Laravel documentation for the framework translation API; use the WordPress domain integration when sharing translations with WordPress code.

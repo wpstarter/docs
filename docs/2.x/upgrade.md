@@ -90,6 +90,8 @@ WpRoute::middleware('web')->group(ws_base_path('routes/wp.php'));
 
 Keep any application-specific namespace, prefix, and rate-limiter configuration. The supplied 1.x and 2.x references already use this arrangement. Admin routes continue to load from the admin provider at runtime. See [cache and deployment](./configuration.md#configuration-caching).
 
+If URL routes use `->hook(...)`, clear the URL route cache and leave it disabled: the compiled matcher bypasses the hook validator and can dispatch those controllers early. See [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
+
 ## Check application-specific compatibility {#application-compatibility}
 
 Use Laravel's upgrade guides for shared APIs across [9.x](https://laravel.com/docs/9.x/upgrade), [10.x](https://laravel.com/docs/10.x/upgrade), [11.x](https://laravel.com/docs/11.x/upgrade), and [12.x](https://laravel.com/docs/12.x/upgrade). Apply the relevant changes using `WpStarter` namespaces and `ws_*` helpers; the WpStarter package supplies the framework changes, while you remain responsible for application overrides and dependencies.

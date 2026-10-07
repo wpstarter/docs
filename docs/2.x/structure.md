@@ -7,6 +7,7 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `main.php` | WordPress plugin header and guarded entrypoint; defines `__WS_FILE__`, `WS_DIR`, and `WS_VERSION` |
 | `WordpressStarter.php` | Coordinates WordPress hooks, early bootstrap, application bootstrap, and frontend dispatch |
 | `bootstrap/autoload.php` | Loads WordPress if needed, Composer, optional custom bootstrap, and the starter class |
+| `app/PluginsLoader.php` | Optional early rules for [conditional plugin loading](./plugins-loader.md); create this file when needed |
 | `bootstrap/load-wp.php` | Finds a nearby configured WordPress installation for CLI/bootstrap use |
 | `bootstrap/app.php` | Creates `WpStarter\Wordpress\Application` and binds HTTP/console kernels and exception handler |
 | `app/Http/Kernel.php` | Frontend global middleware, groups, aliases; extends the WordPress kernel |

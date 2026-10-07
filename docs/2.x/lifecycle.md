@@ -14,6 +14,8 @@ Its early bootstrap runs through `ws_loaded`, normally on `muplugins_loaded` or 
 
 Providers can register WordPress callbacks during bootstrap. They should not assume that the main query or all plugins' later initialization is complete.
 
+The optional `app/PluginsLoader.php` runs after early bootstrap and before provider bootstrap. To filter regular plugins before they load, enter through a must-use plugin; see [conditional plugin loading](./plugins-loader.md).
+
 ## Frontend dispatch {#frontend-dispatch}
 
 1. After `ws_booted`, the starter registers frontend callbacks for `init:1` and any hooks requested by URL routes.
@@ -48,7 +50,7 @@ For a WordPress frontend response, the response handler:
 3. Installs title filters.
 4. Sends a full-page response, or registers content / shortcode callbacks for later rendering.
 
-Full-page responses terminate and exit after sending. Content and shortcode responses register kernel termination on WordPress `shutdown`. Frontend `ws_pass()` currently has no equivalent termination registration; see the review notes for that implementation gap.
+Full-page responses terminate and exit after sending. Content, shortcode, and frontend `ws_pass()` responses register kernel termination on WordPress `shutdown`.
 
 `wp_view(...)->on('hook', $priority)` schedules the body only when the hook has not fired. If it has already fired, sending happens immediately. This does not move the controller or middleware execution to the selected hook.
 

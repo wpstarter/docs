@@ -21,5 +21,7 @@
 ## WordPress Integrations
 
 - [Settings, Assets, and Translation](./integrations.md)
+- [Resource Manager](./resources.md)
+- [Conditional Plugin Loading](./plugins-loader.md)
 - [Vite and Migration from Mix](./assets.md)
 - [Livewire Integration](./livewire.md)

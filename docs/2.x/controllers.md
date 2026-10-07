@@ -88,10 +88,10 @@ The following table describes production frontend handling through `Kernel::hand
 | `wp_view('page', $data)` | Full WordPress page response | Sends at its configured hook, or immediately if none is set or the hook has fired; then terminates and exits |
 | `content_view('fragment', $data)` | Content response | Adds a `the_content` filter; theme continues; kernel terminates at WordPress `shutdown` |
 | `shortcode_view('fragment', $data)` | Shortcode response | Registers / replaces shortcode callbacks for this request; theme continues; kernel terminates at `shutdown` |
-| `ws_pass()` | Pass-through response | Sends headers and installs title filters, but no body or content replacement; WordPress continues |
+| `ws_pass()` | Pass-through response | Sends headers and installs title filters, but no body or content replacement; WordPress continues; kernel terminates at `shutdown` |
 | `null` / no return | Empty ordinary response | Sent immediately; execution exits; this is not pass-through |
 
-The WordPress response handler sends headers **when it processes the response**, before delayed content rendering. Delaying a `wp_view()` body does not delay its headers. In the current implementation, frontend pass-through does not register the shutdown termination callback used by content and shortcode responses.
+The WordPress response handler sends headers **when it processes the response**, before delayed content rendering. Delaying a `wp_view()` body does not delay its headers. Content, shortcode, and frontend pass-through responses register kernel termination at WordPress `shutdown`.
 
 ### Replace the matched shortcode
 

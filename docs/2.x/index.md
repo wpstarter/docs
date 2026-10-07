@@ -5,7 +5,7 @@ Build a WordPress application using the WpStarter 2.x framework and plugin skele
 These guides focus on WordPress-specific behavior. For shared application APIs, follow the linked Laravel 12.x documentation and use WpStarter namespaces and helpers.
 
 ::: info Version scope
-These guides cover the latest WpStarter 2.x release, based on Laravel 12.x, and the 2.x plugin skeleton. Use the documentation for your framework's major version.
+These guides cover WpStarter 2.x, based on Laravel 12.x, and the 2.x plugin skeleton. WordPress-specific behavior was checked against the bundled framework 2.1.6 reference. Use the documentation for your framework's major version and check your installed source for release-specific differences.
 :::
 
 ## Start here
