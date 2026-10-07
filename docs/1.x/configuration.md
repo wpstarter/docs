@@ -15,7 +15,7 @@ This chapter describes values that interact with the surrounding WordPress appli
 
 ## Environment and wp-config.php {#environment-configuration}
 
-The project has its own `.env` in addition to WordPress's `wp-config.php`. Keep `.env` private and use `ws_env()` only from configuration files when you cache configuration.
+The project normally has its own `.env` in addition to WordPress's `wp-config.php`. Keep `.env` private and use `ws_env()` only from configuration files when you cache configuration. A `.env` file is optional when deployment configuration is supplied another way; see [security and private configuration](./security.md#without-dotenv) for server environment variables, a private PHP file, and an external dotenv path.
 
 WpStarter does not automatically convert arbitrary WordPress constants into configuration. To use a constant, read it explicitly from your config file:
 

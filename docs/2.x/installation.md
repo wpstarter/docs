@@ -59,7 +59,7 @@ Review [WordPress configuration](./configuration.md), especially:
 - The default `wpdb` connection, WordPress authentication guard, and `wp_mail` mailer.
 - Web-server access rules for the application directory.
 
-The skeleton's `.htaccess` denies HTTP access to the application directory. Its `nginx-sample.conf` demonstrates denying the project directory while allowing `public`; replace the sample path with the installed path. Configure your server so application source, `.env`, vendor files, and storage are inaccessible while intended public assets remain available. Requests to the WordPress site still enter through WordPress.
+The skeleton supplies Apache `.htaccess` files and an Nginx sample, but their protection depends on the active web-server configuration. Nginx needs explicit server rules that also account for PHP/static regex locations. Follow [Security and Private Configuration](./security.md) for Apache and Nginx examples, deployment checks, and alternatives to `.env`. Requests to the WordPress site still enter through WordPress.
 
 ## Try the supplied examples {#try-the-supplied-examples}
 

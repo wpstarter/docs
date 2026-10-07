@@ -5,6 +5,7 @@
 - [Installation](./installation.md)
 - [Plugin Structure](./structure.md)
 - [WordPress Configuration](./configuration.md)
+- [Security and Private Configuration](./security.md)
 
 ## Handle Frontend Requests
 
