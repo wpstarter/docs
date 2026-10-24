@@ -6,13 +6,12 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | --- | --- |
 | `main.php` | WordPress plugin header and guarded entrypoint; defines `__WS_FILE__`, `WS_DIR`, and `WS_VERSION` |
 | `WordpressStarter.php` | Coordinates WordPress hooks, early bootstrap, application bootstrap, and frontend dispatch |
-| `bootstrap/autoload.php` | Loads WordPress if needed, Composer, optional custom bootstrap, and the starter class |
+| `autoload.php` | Loads a nearby configured WordPress installation if needed, Composer, and the starter class |
+| `bootstrap/providers.php` | Registers application service providers |
+| `routes/console.php` | Artisan closure commands |
 | `app/PluginsLoader.php` | Optional early rules for [conditional plugin loading](./plugins-loader.md); create this file when needed |
-| `bootstrap/load-wp.php` | Finds a nearby configured WordPress installation for CLI/bootstrap use |
-| `bootstrap/app.php` | Creates `WpStarter\Wordpress\Application` and binds HTTP/console kernels and exception handler |
-| `app/Http/Kernel.php` | Frontend global middleware, groups, aliases; extends the WordPress kernel |
-| `app/Providers/RouteServiceProvider.php` | Loads URL and shortcode route files |
-| `routes/web.php` / `routes/api.php` | URL routes |
+| `bootstrap/app.php` | Creates the WordPress application with `Application::configure()`; configures URL/console routes, frontend middleware, and exception rendering |
+| `routes/web.php` | URL routes loaded by `withRouting()` with the `web` middleware group |
 | `routes/wp.php` | WordPress shortcode routes |
 | `app/Http/Controllers` | Frontend controller actions |
 | `app/Admin/AdminServiceProvider.php` | Admin kernel binding, route group, and view namespace |
@@ -20,9 +19,9 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `app/Admin/routes/admin.php` | Menus and submenus |
 | `app/Admin/Controllers` | Admin controllers with HTTP-method/action dispatch |
 | `app/Admin/resources/views` | Views under `admin::`, including the application layout |
-| `app/View/Components` | WordPress response components with optional `boot()` / `mount()` |
+| `app/View/Components` (optional) | Create this directory for WordPress response components with optional `boot()` / `mount()` |
 | `app/View/Shortcodes` | Components registered with the shortcode manager |
-| `app/Providers/AppServiceProvider.php` | Application integration, sample shortcode registration, and text-domain loading |
+| `app/Providers/AppServiceProvider.php` | Loads shortcode routes, registers the sample shortcode, and loads the text domain |
 | `app/Providers/SettingServiceProvider.php` | Defines the WordPress option key for application settings |
 | `config` | Framework and WordPress service configuration |
 | `resources/views` / `resources/lang` | Frontend Blade templates and translation resources |
@@ -32,6 +31,8 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `artisan` | Application CLI entrypoint with WordPress bootstrap |
 | `vendor/wpstarter/framework/src/WpStarter/Wordpress` | WordPress integration implementation installed by Composer |
 
-The three route files and the admin module use different facades and kernels. Start with [routing](./routing.md) before moving declarations between them.
+`Application::configure()` binds the framework's WordPress HTTP and console kernels. Configure frontend middleware through `withMiddleware()` and exception handling through `withExceptions()` in `bootstrap/app.php`. The admin module keeps its own `App\Admin\Kernel`.
+
+URL, shortcode, and admin routes use different facades. Start with [routing](./routing.md) before moving declarations between them. An API route file is optional and must be added to `withRouting()` when needed.
 
 Keep framework changes in the framework package's source repository rather than relying on edits under `vendor`, which a Composer update can replace. The skeleton's sample controllers, views, and routes are application examples you can adapt or remove.

@@ -40,7 +40,7 @@ Use `ws_config('app.name')` in application code. Persistent user-editable plugin
 | --- | --- | --- |
 | Database | `DB_CONNECTION=wpdb`; connection driver `wp` | Uses the WordPress database adapter and `$wpdb`; credentials come from `DB_HOST`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD` constants |
 | Table names | `database.connections.wpdb.prefix` from `$wpdb->prefix` | Application table names use the configured WordPress prefix |
-| Authentication | Guard `web`, driver `wp`, provider `wp`, model `App\Models\User` | Reads the current WordPress user and uses WordPress authentication cookies |
+| Authentication | Guard `web` uses driver `wp` and provider `users`; that provider uses driver `wp` and model `App\Models\User` | Reads the current WordPress user and uses WordPress authentication cookies |
 | Mail | `MAIL_MAILER=wp_mail`, transport `wp` | Delivers through WordPress `wp_mail()` |
 | Sessions | `SESSION_DRIVER=file` in the example environment | Framework sessions for CSRF, validation errors, old input, and notices; distinct from WordPress login cookies |
 
@@ -52,7 +52,7 @@ For mail templates and the normal database/query APIs, refer to the correspondin
 
 ## The current User object {#current-user}
 
-With the supplied `wp` guard/provider, access the logged-in user through the usual request or facade API:
+With the supplied WordPress authentication drivers, access the logged-in user through the usual request or facade API:
 
 ```php
 use WpStarter\Http\Request;
@@ -101,7 +101,7 @@ php artisan config:cache
 
 WordPress-derived values such as table prefixes, URLs, and locale can become fixed in the cache. Do not copy a cache built against a different site's database or URL. Use `php artisan config:clear` when those values change.
 
-`route:cache` caches frontend URL routes only. The supplied 2.x provider loads `routes/wp.php` outside the URL route callback, so shortcode routes are registered even when URL routes are cached. Admin routes are registered separately by their own provider. Shortcode and admin routes remain runtime collections; their WordPress matching is not part of the compiled URL cache.
+`route:cache` caches frontend URL routes only. `AppServiceProvider::boot()` loads `routes/wp.php` independently of `withRouting()` in `bootstrap/app.php`, so shortcode routes are registered even when URL routes are cached. Admin routes are registered separately by their own provider. Shortcode and admin routes remain runtime collections; their WordPress matching is not part of the compiled URL cache.
 
 The compiled URL matcher bypasses the WordPress hook validator. Keep URL route caching disabled when controllers rely on `->hook(...)` to run after WordPress initialization; see [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
 
@@ -115,4 +115,4 @@ Ensure session/cache directories remain writable. For a WordPress-root installat
 
 Keep both application debug flags false in production. See the WordPress exception bootstrap and `config/logging.php` when choosing how external errors should be logged.
 
-The supplied HTTP and admin kernels include maintenance middleware, and `WordpressStarter::initWeb()` checks for a pre-rendered maintenance file. Maintenance can therefore affect the surrounding WordPress request, including admin access. Evaluate it on your site before using `php artisan down` during deployment. Use Laravel's documentation for the general maintenance command options.
+The default frontend middleware and the supplied admin kernel include maintenance middleware. `WordpressStarter::boot()` also calls `checkMaintenance()` before creating the application to load a pre-rendered maintenance file for web requests. Maintenance can therefore affect the surrounding WordPress request, including admin access. Evaluate it on your site before using `php artisan down` during deployment. Use Laravel's documentation for the general maintenance command options.

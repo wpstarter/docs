@@ -18,9 +18,9 @@ cd /path/to/wordpress/wp-content/plugins
 composer create-project "wpstarter/wpstarter:2.*" example-plugin
 ```
 
-The `2.*` constraint selects the latest compatible stable 2.x skeleton release. It is equivalent to `^2.0` and avoids caret escaping issues when invoking Composer through a Windows batch file. The skeleton and `wpstarter/framework` have separate release versions.
+This installs the plugin skeleton together with `wpstarter/framework` and its dependencies.
 
-The 2.x skeleton requires PHP 8.2 or later and uses `wpstarter/framework` 2.x. Use the project's Composer requirements and lockfile to determine the required extensions for your deployment, and run `composer check-platform-reqs`. Composer's install scripts create `.env` and generate the application key; verify that `APP_KEY` is populated.
+Use PHP 8.2 or later with the extensions required by Composer. The install scripts create `.env` and generate `APP_KEY`.
 
 Update the plugin header in `main.php` for your application, then activate it in WordPress. The project must be able to load an installed WordPress instance. Its CLI bootstrap searches for `wp-load.php` relative to the project and supports the plugin-directory and WordPress-root layouts described here.
 

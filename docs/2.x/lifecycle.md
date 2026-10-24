@@ -8,7 +8,9 @@
 
 ## Bootstrap {#bootstrap}
 
-WordPress loads `main.php`, which creates `WordpressStarter` unless WordPress is installing or another entrypoint has already defined `__WS_FILE__`. The starter creates the application and selects the HTTP or console kernel.
+WordPress loads `main.php`, which requires the root `autoload.php` and creates `WordpressStarter` unless WordPress is installing or another entrypoint has already defined `__WS_FILE__`. `WordpressStarter::boot()` checks for pre-rendered maintenance output, creates the application from `bootstrap/app.php`, and selects the framework's WordPress HTTP or console kernel. For web requests, it captures and binds the request before early bootstrap.
+
+`bootstrap/app.php` uses `Application::configure()` to configure URL routes, console commands, frontend middleware, and exceptions. Application providers are listed in `bootstrap/providers.php`; the admin provider binds its separate kernel.
 
 Its early bootstrap runs through `ws_loaded`, normally on `muplugins_loaded` or immediately if that action has already fired. Early bootstrap loads environment, configuration, exception handling, and facades. At `plugins_loaded:1`, the starter triggers `ws_boot`, bootstraps providers, then triggers `ws_booted`.
 
@@ -19,7 +21,7 @@ The optional `app/PluginsLoader.php` runs after early bootstrap and before provi
 ## Frontend dispatch {#frontend-dispatch}
 
 1. After `ws_booted`, the starter registers frontend callbacks for `init:1` and any hooks requested by URL routes.
-2. At a dispatch hook, the HTTP kernel captures the request, applies global middleware, and tries the URL router.
+2. At a dispatch hook, the HTTP kernel receives the request captured by the starter, applies global middleware, and tries the URL router.
 3. If the URL router reports no route match, the kernel registers a callback at `template_redirect:1`.
 4. At that callback, the kernel reuses the captured request, applies its middleware pipeline, and tries the shortcode router against the queried WordPress post.
 5. A matched response is processed according to its type. If no shortcode route matches, WordPress continues its normal template flow.

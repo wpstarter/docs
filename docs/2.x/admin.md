@@ -11,7 +11,7 @@
 
 ## Enable the admin module {#enable-the-admin-module}
 
-The skeleton already includes `App\Admin\AdminServiceProvider` in `config/app.php`. It binds `WpStarter\Wordpress\Admin\Contracts\Kernel` to `App\Admin\Kernel`, loads `app/Admin/routes/admin.php` with the `admin` middleware group, and registers views under the `admin::` namespace.
+The skeleton already includes `App\Admin\AdminServiceProvider` in `bootstrap/providers.php`. It binds `WpStarter\Wordpress\Admin\Contracts\Kernel` to `App\Admin\Kernel`, loads `app/Admin/routes/admin.php` with the `admin` middleware group, and registers views under the `admin::` namespace.
 
 The framework registers menus on `admin_menu` and dispatches controllers on `current_screen`. Matching compares the menu's hook suffix returned by WordPress with the current screen ID. Controllers execute before WordPress prints the admin page, allowing redirects and headers to be sent.
 
@@ -195,7 +195,7 @@ Frontend response helpers such as `content_view()`, `shortcode_view()`, and `wp_
 
 ## Middleware and capabilities {#middleware-and-capabilities}
 
-Admin middleware is configured in `App\Admin\Kernel`, independently of `App\Http\Kernel`. A frontend middleware alias is not automatically available to admin routes. Add its alias to the admin kernel or attach a middleware class directly.
+Admin middleware is configured in `App\Admin\Kernel`, independently of the frontend `withMiddleware()` configuration in `bootstrap/app.php`. A frontend middleware alias is not automatically available to admin routes. Add its alias to the admin kernel or attach a middleware class directly.
 
 Set an explicit capability for privileged menus. The default `read` capability is appropriate only for pages intended to be accessible to users with that capability. Hiding a menu does not enforce access control. Check the capability again in actions performing privileged changes.
 

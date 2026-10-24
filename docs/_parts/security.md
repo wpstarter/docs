@@ -138,7 +138,7 @@ With configuration caching enabled, the environment-file bootstrap is skipped an
 
 Renaming dotenv text to `.env.php` or `env.php` does **not** make the loader execute PHP. `loadEnvironmentFrom()` changes a filename; the loader still parses dotenv syntax. A dotenv file with a `.php` extension can expose its raw text if requested through PHP, so changing its extension is not protection.
 
-To use real PHP, keep the file outside the document root and require it through the skeleton's existing `bootstrap/load-custom.php` hook. Both versions run this hook after Composer autoload and before application/environment bootstrap. For example, create `/etc/wpstarter/example-plugin/env.php` readable by the PHP and CLI users:
+To use real PHP, keep the file outside the document root and load it after Composer autoload but before application/environment bootstrap. For example, create `/etc/wpstarter/example-plugin/env.php` readable by the PHP and CLI users:
 
 ```php
 <?php
@@ -153,7 +153,7 @@ return [
 ];
 ```
 
-Create `bootstrap/load-custom.php` in the application:
+Create `bootstrap/load-custom.php` in the application with this loader:
 
 ```php
 <?php
@@ -174,6 +174,14 @@ foreach ($privateEnvironment as $name => $value) {
 unset($privateEnvironment, $environmentRepository, $name, $value);
 ```
 
+The 1.x skeleton automatically requires `bootstrap/load-custom.php`. The current 2.x skeleton has no automatic custom-bootstrap hook. In 2.x, add the following to the root `autoload.php`, immediately after `require WS_DIR . '/vendor/autoload.php';` and before `require WS_DIR.'/WordpressStarter.php';`:
+
+```php
+require WS_DIR.'/bootstrap/load-custom.php';
+```
+
+This ensures the values are available before `WordpressStarter` creates and bootstraps the application.
+
 Use strings such as `'false'` and `'true'` for the environment values so `ws_env()` performs its usual boolean conversion. This populates PHP's environment arrays for framework lookup; it does not export values to subprocesses. Adapt the private absolute path to your deployment. A required file that is missing fails startup rather than silently supplying empty secrets.
 
 Verify configuration before removing the old `.env` and its environment-specific variants from the deployment. Ensure any additional mail, cache, queue, or service settings are supplied too. Composer's skeleton scripts create `.env` and run key-generation commands, so review those scripts when adopting this layout; subsequent installations can recreate the old file. Normal `key:generate` writes to the configured dotenv file, not to this PHP array. For a new application only, `php artisan key:generate --show` displays a key to store privately; it does not update the PHP file. Avoid printing existing secrets during verification.
@@ -182,11 +190,13 @@ Alternatively, require a private PHP array directly from the relevant `config/*.
 
 ## Move or rename the dotenv file {#custom-dotenv-path}
 
-If you prefer dotenv syntax, both application versions support moving the file outside the document root. Add this after creating `$app` in `bootstrap/app.php`, before returning it:
+If you prefer dotenv syntax, both application versions support moving the file outside the document root. In the current 2.x `bootstrap/app.php`, change `return Application::configure(...)` to `$app = Application::configure(...)`, keeping the existing builder chain through `->create()`. Then add the following before returning `$app`. In 1.x, add it after the existing `$app` is created:
 
 ```php
 $app->useEnvironmentPath('/etc/wpstarter/example-plugin');
 $app->loadEnvironmentFrom('application.env');
+
+return $app;
 ```
 
 `application.env` still contains `KEY=value` text. Environment-specific selection (`APP_ENV` or CLI `--env`) can select a suffix such as `application.env.production`. Moving the file protects it from ordinary document-root requests; verify the private directory is not exposed through an alias and remains readable by the processes that need it. Adapt Composer scripts and key provisioning to this path, and rebuild configuration caches after changes.

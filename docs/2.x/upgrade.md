@@ -14,7 +14,7 @@ WpStarter 1.x uses a Laravel 8.x foundation; 2.x uses Laravel 12. Start by upgra
 
 Custom framework extensions must match the new APIs, and optional packages must support WpStarter 2.x. Review the application-specific compatibility guidance below for the features your application uses.
 
-The 2.x skeleton retains the WordPress entrypoint, explicit kernel bindings in `bootstrap/app.php`, application providers, and separate frontend/admin kernels. You do not need to adopt a standalone Laravel application's new bootstrap structure to upgrade this skeleton. Keep the existing application configuration, routes, and data.
+The current 2.x skeleton uses `WpStarter\Wordpress\Application::configure()` in `bootstrap/app.php`, registers application providers in `bootstrap/providers.php`, and loads WordPress through the root `autoload.php`. Frontend middleware and exceptions are configured through `withMiddleware()` and `withExceptions()`; the admin module retains its own kernel. Existing applications can keep their explicit kernel bindings while upgrading the framework. If adopting the new skeleton layout, migrate custom middleware, exception handling, providers, console commands, and bootstrap code before removing the old files. Preserve application configuration, routes, and data.
 
 **Vite is recommended, not required.** WpStarter 2.x still supports Laravel Mix, `ws_mix()`, and `public/mix-manifest.json`. You can upgrade the PHP framework first and migrate the asset build separately.
 
@@ -73,7 +73,18 @@ If your application already extends `WpStarter\Wordpress\Auth\User`, no change i
 
 ## Keep WordPress routes loaded {#route-registration}
 
-The URL route cache covers the normal HTTP router, not the shortcode or admin routers. If your old `RouteServiceProvider` loads `routes/wp.php` inside `$this->routes(...)`, move that registration outside the callback:
+The URL route cache covers the normal HTTP router, not the shortcode or admin routers. The current skeleton loads URL routes through `withRouting()` in `bootstrap/app.php` and shortcode routes from `AppServiceProvider::boot()`:
+
+```php
+use WpStarter\Wordpress\Facades\Route as WpRoute;
+
+// Inside App\Providers\AppServiceProvider::boot():
+WpRoute::middleware('web')->group(ws_base_path('routes/wp.php'));
+```
+
+Keep this registration outside `withRouting()`, including its `then` callback, so it also runs with cached URL routes. Keep `AppServiceProvider` registered in `bootstrap/providers.php`.
+
+If retaining an older `RouteServiceProvider`, load shortcode routes outside `$this->routes(...)`:
 
 ```php
 use WpStarter\Support\Facades\Route;
@@ -88,7 +99,7 @@ $this->routes(function () {
 WpRoute::middleware('web')->group(ws_base_path('routes/wp.php'));
 ```
 
-Keep any application-specific namespace, prefix, and rate-limiter configuration. The supplied 1.x and 2.x references already use this arrangement. Admin routes continue to load from the admin provider at runtime. See [cache and deployment](./configuration.md#configuration-caching).
+Keep any application-specific namespace, prefix, and rate-limiter configuration. When moving API routes to `withRouting(api: ...)`, account for its default `/api` prefix; older skeletons declared `/api` in individual route paths. Remove that duplicate prefix from the declarations or set `apiPrefix: ''` to preserve the existing paths. Admin routes continue to load from the admin provider at runtime. See [cache and deployment](./configuration.md#configuration-caching).
 
 If URL routes use `->hook(...)`, clear the URL route cache and leave it disabled: the compiled matcher bypasses the hook validator and can dispatch those controllers early. See [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
 

@@ -16,11 +16,10 @@ WpStarter has three routers. Choose according to how WordPress should participat
 | Route file in the skeleton | Facade | Matches | Default middleware |
 | --- | --- | --- | --- |
 | `routes/web.php` | `WpStarter\Support\Facades\Route` | URL path and HTTP method | `web` |
-| `routes/api.php` | `WpStarter\Support\Facades\Route` | URL path and HTTP method | `api` |
 | `routes/wp.php` | `WpStarter\Wordpress\Facades\Route` | Shortcode tag in the queried singular post's content and HTTP method | `web` |
 | `app/Admin/routes/admin.php` | `WpStarter\Wordpress\Admin\Facades\Route` | Registered WordPress admin screen and HTTP method | `admin` |
 
-`App\Providers\RouteServiceProvider` loads the frontend files. `App\Admin\AdminServiceProvider` loads the admin file. These are skeleton conventions; inspect the providers when changing their groups.
+`withRouting()` in `bootstrap/app.php` loads `routes/web.php` and registers the `/up` health endpoint. `App\Providers\AppServiceProvider::boot()` loads `routes/wp.php`, and `App\Admin\AdminServiceProvider` loads the admin file.
 
 URL routes run first, normally at `init:1`. If the URL router cannot match a route, the WordPress kernel schedules shortcode routing at `template_redirect:1`, after WordPress has resolved its main query. If neither router matches, WordPress continues with its normal template. A matched route returning a 404 response does not trigger this fallback.
 
@@ -39,7 +38,18 @@ Route::get('/greeting/{name}', function ($name) {
 
 Registration follows the Laravel 12.x routing API: HTTP verbs, groups, names, constraints, and controller actions. Refer to [Laravel's routing documentation](https://laravel.com/docs/12.x/routing) for those APIs. Use the `WpStarter` namespace in place of `Illuminate` and helpers such as `ws_route()`.
 
-**The supplied skeleton does not add an `/api` prefix.** Its `routes/api.php` example explicitly registers `/api/me`. To apply a prefix to the entire file, add `->prefix('api')` to its group in `RouteServiceProvider` and remove `/api` from each route declaration.
+The skeleton does not include an API route file. To add one, create `routes/api.php` and add the `api` argument to the existing `withRouting()` call in `bootstrap/app.php`:
+
+```php
+->withRouting(
+    web: __DIR__.'/../routes/web.php',
+    api: __DIR__.'/../routes/api.php',
+    commands: __DIR__.'/../routes/console.php',
+    health: '/up',
+)
+```
+
+The builder applies the `api` middleware group and an `/api` prefix by default. For example, declare `Route::get('/me', ...)` in that file to serve `/api/me`. Change `apiPrefix` in `withRouting()` if needed.
 
 Ordinary responses take over the request. Returning a string, JSON, redirect, or `ws_view()` sends a response and stops WordPress before the theme renders. Returning a WordPress response changes that behavior; see [controller responses](./controllers.md#return-values).
 
@@ -127,7 +137,20 @@ The skeleton assigns `web` middleware to shortcode routes, including sessions an
 
 ## Middleware and bindings {#middleware-and-bindings}
 
-The WordPress kernel copies the HTTP kernel's middleware aliases, groups, and priority list into the shortcode router. Attach middleware using the usual route API:
+Configure frontend middleware in the existing `withMiddleware()` callback in `bootstrap/app.php`:
+
+```php
+use WpStarter\Foundation\Configuration\Middleware;
+
+// Inside the Application::configure() chain:
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->alias([
+        'catalog.access' => \App\Http\Middleware\CatalogAccess::class,
+    ]);
+})
+```
+
+The WordPress builder supplies the default `web` and `api` groups; `web` uses the WordPress session middleware. The HTTP kernel copies its middleware aliases, groups, and priority list into the shortcode router. Attach middleware using the usual route API:
 
 ```php
 Route::get('catalog', [\App\Http\Controllers\CatalogController::class, 'show'])
