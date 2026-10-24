@@ -22,7 +22,7 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `app/View/Components` (optional) | Create this directory for WordPress response components with optional `boot()` / `mount()` |
 | `app/View/Shortcodes` | Components registered with the shortcode manager |
 | `app/Providers/AppServiceProvider.php` | Loads shortcode routes, registers the sample shortcode, and loads the text domain |
-| `app/Providers/SettingServiceProvider.php` | Defines the WordPress option key for application settings |
+| `config/setting.php` | WordPress settings option key, automatic save, and queue restart behavior |
 | `config` | Framework and WordPress service configuration |
 | `resources/views` / `resources/lang` | Frontend Blade templates and translation resources |
 | `vite.config.js` / `package.json` | Vite entrypoints and development/production build commands; existing Mix applications can keep their build setup |
@@ -32,6 +32,8 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `vendor/wpstarter/framework/src/WpStarter/Wordpress` | WordPress integration implementation installed by Composer |
 
 `Application::configure()` binds the framework's WordPress HTTP and console kernels. Configure frontend middleware through `withMiddleware()` and exception handling through `withExceptions()` in `bootstrap/app.php`. The admin module keeps its own `App\Admin\Kernel`.
+
+The framework registers the settings provider automatically. Configure [application settings](./integrations.md#settings) in `config/setting.php`; no settings provider entry is needed in `bootstrap/providers.php`.
 
 URL, shortcode, and admin routes use different facades. Start with [routing](./routing.md) before moving declarations between them. An API route file is optional and must be added to `withRouting()` when needed.
 

@@ -4,6 +4,7 @@
 - [Update PHP and Composer dependencies](#dependencies)
 - [Replace the removed user class if still used](#user-class)
 - [Keep WordPress routes loaded](#route-registration)
+- [Move settings configuration](#settings-configuration)
 - [Check application-specific compatibility](#application-compatibility)
 - [Clear caches and verify](#verification)
 - [Optionally migrate Mix to Vite](#optional-vite-migration)
@@ -102,6 +103,18 @@ WpRoute::middleware('web')->group(ws_base_path('routes/wp.php'));
 Keep any application-specific namespace, prefix, and rate-limiter configuration. When moving API routes to `withRouting(api: ...)`, account for its default `/api` prefix; older skeletons declared `/api` in individual route paths. Remove that duplicate prefix from the declarations or set `apiPrefix: ''` to preserve the existing paths. Admin routes continue to load from the admin provider at runtime. See [cache and deployment](./configuration.md#configuration-caching).
 
 If URL routes use `->hook(...)`, clear the URL route cache and leave it disabled: the compiled matcher bypasses the hook validator and can dispatch those controllers early. See [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
+
+## Move settings configuration {#settings-configuration}
+
+Framework 2.2.6 automatically registers the settings provider. Skeleton 2.2.7 configures it through `config/setting.php` instead of supplying `App\Providers\SettingServiceProvider`.
+
+When adopting this setup:
+
+- Set `option_key` to the exact key returned by your existing provider's `getOptionKey()`. Preserving the key keeps the same stored settings.
+- Move `$autoSave` and `$autoRestartQueue` values to `autosave` and `restart_queue`. The framework now reads these configuration keys instead of those provider properties.
+- After migrating any additional custom behavior, remove the application settings provider and its registration from `bootstrap/providers.php` or `config/app.php`, wherever it was declared.
+
+A custom provider extending `WpStarter\Wordpress\Setting\SettingServiceProvider` can remain registered when needed; the framework detects it and skips the default provider. Such a provider can override `getOptionKey()`, `isAutosave()`, or `isRestartQueue()` for custom behavior. See [settings configuration](./integrations.md#settings) for the defaults and API.
 
 ## Check application-specific compatibility {#application-compatibility}
 

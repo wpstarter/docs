@@ -6,7 +6,20 @@
 
 ## Settings {#settings}
 
-The skeleton's `App\Providers\SettingServiceProvider` uses the WordPress option key `ws_settings`. Change `getOptionKey()` for your application to avoid sharing settings with another plugin.
+Settings are available through `ws_setting()` without creating or registering an application settings provider. The framework automatically registers `WpStarter\Wordpress\Setting\SettingServiceProvider` after application providers have been registered, unless a provider extending that class is already present.
+
+Configure settings in the skeleton's `config/setting.php`:
+
+```php
+<?php
+return [
+    'option_key' => 'ws_settings',
+    'autosave' => true,
+    'restart_queue' => true,
+];
+```
+
+These are also the framework defaults when the configuration file is absent. Choose an application-specific `option_key` before storing settings. Changing the key later selects another WordPress option; it does not migrate existing data.
 
 The repository supports dotted keys:
 
@@ -19,9 +32,9 @@ ws_setting()->save();
 
 `ws_setting($key, $default)` reads a value. Passing an array sets values in memory; calling with no arguments returns the repository. It also supports `get()`, `set()`, `has()`, and array access.
 
-The provider automatically saves changes at WordPress `shutdown` by default. Call `save()` explicitly when persistence must happen before returning, as in the admin form example. Settings are stored together in one option; `save($autoload = false)` calls `update_option()`.
+With `setting.autosave` enabled, changes are saved at WordPress `shutdown` if the settings repository has been resolved. Call `save()` explicitly when persistence must happen before returning, as in the admin form example. Settings are stored together in the configured option; `save($autoload = false)` calls `update_option()`.
 
-The provider also listens for changes to that option, reloads the repository, and calls `queue:restart` by default. Provider properties `$autoSave` and `$autoRestartQueue` control those behaviors. Queue workers retain their own in-memory state, so a restart is useful when settings change.
+With `setting.restart_queue` enabled, the provider listens for updates to that option, reloads the repository, and calls `queue:restart`. Set either configuration flag to `false` to disable its behavior. Queue workers retain their own in-memory state, so a restart is useful when settings change.
 
 Remove settings with `forget()`. Deletions mark the repository as changed and are persisted by `save()` or the automatic shutdown save:
 
