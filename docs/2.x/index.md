@@ -10,12 +10,12 @@ These guides cover WpStarter 2.x, based on Laravel 12.x, and the current 2.x plu
 
 ## Start here
 
-- [Upgrade an existing 1.x application](./upgrade.md).
 - [Install the plugin skeleton](./installation.md).
 - [Understand the plugin structure](./structure.md) and [WordPress configuration](./configuration.md).
 - [Choose URL or shortcode routing](./routing.md).
 - [Read controller parameters and response behavior](./controllers.md).
 - [Build WordPress admin menus and forms](./admin.md).
 - [Bundle assets with Vite or keep Laravel Mix](./assets.md).
+- [Upgrade an existing application](./upgrade.md).
 
 For the complete guide list, see the [documentation contents](./documentation.md). Use the version menu to select documentation or return to the [shared homepage](../index.md).

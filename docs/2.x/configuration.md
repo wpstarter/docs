@@ -105,7 +105,7 @@ WordPress-derived values such as table prefixes, URLs, and locale can become fix
 
 The compiled URL matcher bypasses the WordPress hook validator. Keep URL route caching disabled when controllers rely on `->hook(...)` to run after WordPress initialization; see [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
 
-If an older application still loads `routes/wp.php` inside `$this->routes(...)`, move it outside that callback before enabling URL route caching; see [upgrading route registration](./upgrade.md#route-registration). Build the cache in the target WordPress environment and verify URL, shortcode, and admin pages afterwards.
+Build the cache in the target WordPress environment and verify URL, shortcode, and admin pages afterwards.
 
 Ensure session/cache directories remain writable. For a WordPress-root installation served by Nginx, adapt the provided access rules as described in [installation](./installation.md#initial-configuration).
 

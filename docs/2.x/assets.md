@@ -12,7 +12,7 @@
 
 Vite is the recommended build tool for WpStarter 2.x and is configured in the 2.x skeleton. Migrating to it is optional: `WpStarter\Foundation\Mix` and `ws_mix()` remain available, including manifest versioning and Mix hot-file handling.
 
-Upgrade the PHP framework independently if that makes deployment easier. Use one asset-loading path for each entrypoint so the same application script is not loaded twice.
+Use one asset-loading path for each entrypoint so the same application script is not loaded twice.
 
 For general Vite features, consult [Laravel 12.x asset bundling](https://laravel.com/docs/12.x/vite). Here, Blade resolves `WpStarter\Foundation\Vite`, and asset URLs must point to the plugin's public directory inside WordPress.
 

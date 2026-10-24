@@ -7,8 +7,6 @@
 
 WpStarter runs an application inside WordPress. Its framework uses Laravel-style APIs under the `WpStarter` namespace and integrates routing, views, authentication, database access, and mail with WordPress. These docs focus on that integration. For shared framework concepts, use the Laravel 12.x documentation.
 
-Already using 1.x? Follow the [upgrade guide](./upgrade.md) rather than creating another application.
-
 ## Install the plugin skeleton {#installation-via-composer}
 
 Install into your WordPress plugins directory:

@@ -3,7 +3,7 @@
 ## Start a WordPress Project
 
 - [Installation](./installation.md)
-- [Upgrade from 1.x](./upgrade.md)
+- [Upgrade guide](./upgrade.md)
 - [Plugin Structure](./structure.md)
 - [WordPress Configuration](./configuration.md)
 - [Security and Private Configuration](./security.md)
