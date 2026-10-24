@@ -113,16 +113,16 @@ with the source entrypoints configured in Vite:
 
 The directive emits stylesheet, module script, and preload tags. During development it reads `public/hot`; for a production build it reads `public/build/manifest.json`. It returns HTML tags, not a single script URL.
 
-For PHP integration, resolve the WpStarter class:
+To obtain an asset URL in PHP, use the Vite facade:
 
 ```php
-use WpStarter\Foundation\Vite;
+use WpStarter\Support\Facades\Vite;
 
-$tags = ws_app(Vite::class)([
-    'resources/css/app.css',
-    'resources/js/app.js',
-]);
+$scriptUrl = Vite::asset('resources/js/app.js');
+$styleUrl = Vite::asset('resources/css/app.css');
 ```
+
+`asset()` returns a URL suitable for the Resource Manager or WordPress enqueue functions. The facade resolves the same `WpStarter\Foundation\Vite` singleton used by `@vite`. For an instance, use `ws_app(\WpStarter\Foundation\Vite::class)` or inject that class into a constructor. The framework does not register a `vite` container alias, so use the facade or class binding rather than `ws_app('vite')`.
 
 Set `app.asset_url` to the plugin's public URL. The supplied configuration defaults to `ws_plugin_url('public')`, so the PHP side can generate plugin URLs. For the JavaScript build, set `ASSET_URL` to that same public URL in the build environment; for example:
 
@@ -137,23 +137,108 @@ The Vite plugin reads this environment value to generate its production base pat
 
 In a full-page Blade layout, place `@vite(...)` in `<head>`. Keep `wp_head()` and `wp_footer()` when that layout also uses WordPress enqueue queues; see [full-page views](./views.md#full-page-views).
 
-For content or shortcode responses that keep the theme, arrange for the directive's tags to be printed in the theme's head, or register a callback before `wp_head` runs. For an admin screen, use the relevant admin head hook. This frontend example emits the Vite tags once when WordPress prints the head:
+For theme-rendered content, shortcode pages, and admin screens, resolve URLs with `Vite::asset()` and enqueue them through the [Resource Manager](./resources.md). WordPress then owns the handles, dependencies, and output timing. Keep `@vite` for Blade layouts that own their asset output; use one loading method per bundle on a page.
+
+### Enqueue through the Resource Manager
+
+The following example uses the skeleton's separate CSS and JavaScript entrypoints. Register these callbacks once in `AppServiceProvider::boot()`. The tag filter requires WordPress 6.2 or later:
 
 ```php
-use WpStarter\Foundation\Vite;
+use WpStarter\Support\Facades\Vite;
 
-// Register from a provider or matched controller before wp_head runs.
-add_action('wp_head', function () {
-    echo ws_app(Vite::class)([
-        'resources/css/app.css',
-        'resources/js/app.js',
-    ]);
+add_filter('script_loader_tag', function ($tag, $handle) {
+    if (!in_array($handle, ['catalog-vite-client', 'catalog-vite-app'], true)) {
+        return $tag;
+    }
+
+    $html = new \WP_HTML_Tag_Processor($tag);
+    if ($html->next_tag('script')) {
+        $html->set_attribute('type', 'module');
+        $html->set_attribute('crossorigin', 'anonymous');
+    }
+
+    return $html->get_updated_html();
+}, 10, 2);
+
+add_action('wp_enqueue_scripts', function () {
+    if (!is_page('catalog')) {
+        return;
+    }
+
+    $resources = ws_resources();
+    $version = Vite::manifestHash() ?: WS_VERSION;
+    $dependencies = [];
+
+    if (Vite::isRunningHot()) {
+        $resources->addJs('catalog-vite-client', Vite::asset('@vite/client'), [], $version);
+        $dependencies[] = 'catalog-vite-client';
+    }
+
+    $resources->addCss('catalog-vite-style', Vite::asset('resources/css/app.css'), [], $version);
+    $resources->addJs('catalog-vite-app', Vite::asset('resources/js/app.js'), $dependencies, $version);
 });
 ```
 
-Limit registration to the pages that need the bundle. Theme head hooks must actually run. A content fragment should not repeat the entrypoint tags for every shortcode occurrence.
+Change the page condition and use handles unique to your plugin. The Resource Manager flushes its frontend queue at `wp_enqueue_scripts:100`, after this callback. You can also queue the same resources directly from a matched controller before asset output. The theme must run its usual `wp_head()` and `wp_footer()` hooks.
 
-Vite tags and [WordPress resource queues](./integrations.md#assets) have different roles. Do not pass `$tags` above as the source to `ws_enqueue_js()`. It expects a URL, and its normal script tag is not automatically a Vite module script. Direct Vite tags do not register WordPress handles or dependency ordering; retain native enqueues for assets that rely on those features, or implement an adapter that handles module tags, development client, CSS, and imported chunks explicitly.
+The scoped [`script_loader_tag` filter](https://developer.wordpress.org/reference/hooks/script_loader_tag/) makes only these Vite scripts modules and preserves their other attributes. Resource Manager JavaScript handles use WordPress's classic script queue, so setting module attributes is necessary. WordPress handle dependencies order the tags; ES module dependencies belong in JavaScript `import` statements.
+
+For admin pages, use [`admin_enqueue_scripts`](https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/), check its `$hookSuffix` argument against your screen, and use `addAdminCss()` / `addAdminJs()` in place of `addCss()` / `addJs()`. Enqueue the development client through `addAdminJs()` too; keep the same module-tag filter for its handles. Register these callbacks from a provider, before WordPress runs the enqueue hooks.
+
+### Use WordPress enqueue functions directly
+
+With the same Vite facade import at the top of the file, the equivalent native calls inside a [`wp_enqueue_scripts`](https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/) callback are:
+
+```php
+$dependencies = [];
+
+if (Vite::isRunningHot()) {
+    wp_enqueue_script('catalog-vite-client', Vite::asset('@vite/client'), [], null, true);
+    $dependencies[] = 'catalog-vite-client';
+}
+
+wp_enqueue_style('catalog-vite-style', Vite::asset('resources/css/app.css'), [], null);
+wp_enqueue_script('catalog-vite-app', Vite::asset('resources/js/app.js'), $dependencies, null, true);
+```
+
+Keep the module-tag filter from the Resource Manager example. Use either this native enqueue example or the Resource Manager example for a bundle.
+
+### CSS imported from JavaScript
+
+`asset()` resolves one file; it does not enqueue the CSS or preload tags generated by `@vite`. The examples above load CSS from the separate `resources/css/app.css` entrypoint. If JavaScript also imports CSS, production builds extract those styles into the manifest's `css` lists. Enqueue those files as well, including CSS from recursively imported chunks. If you move `app.css` into JavaScript imports, remove its separate Vite input and `addCss()` call to avoid loading it twice. For example, add this inside the Resource Manager callback after resolving `$resources` and `$version`:
+
+```php
+if (!Vite::isRunningHot()) {
+    $manifest = json_decode(
+        file_get_contents(ws_public_path('build/manifest.json')),
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    );
+    $seen = [];
+    $styles = [];
+    $collect = function ($entry) use (&$collect, &$seen, &$styles, $manifest) {
+        if (isset($seen[$entry])) {
+            return;
+        }
+        $seen[$entry] = true;
+
+        foreach ($manifest[$entry]['css'] ?? [] as $file) {
+            $styles[$file] = true;
+        }
+        foreach ($manifest[$entry]['imports'] ?? [] as $import) {
+            $collect($import);
+        }
+    };
+    $collect('resources/js/app.js');
+
+    foreach (array_keys($styles) as $file) {
+        $resources->addCss('catalog-vite-'.md5($file), ws_asset('build/'.$file), [], $version);
+    }
+}
+```
+
+Use `addAdminCss()` for the admin queue. Match the manifest path and asset prefix to your build directory if customized. Static JavaScript imports load through the browser's module graph; Vite handles dynamic-import chunks and their CSS at runtime. Module preloads are optional performance hints. See [Vite's backend integration guide](https://vite.dev/guide/backend-integration.html) for manifest traversal. A URL-based enqueue does not apply custom tag attributes or integrity metadata configured on the Vite tag renderer; configure those through WordPress filters when needed.
 
 ## Development and production {#build-and-deploy}
 

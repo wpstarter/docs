@@ -7,7 +7,7 @@
 - [Translate JavaScript](#javascript-translation)
 - [Run browser callbacks at the footer](#browser-callbacks)
 
-`ws_resources()` resolves `WpStarter\Wordpress\Dependency\ResourceManager`. It bridges application assets to WordPress script/style handles, dependency ordering, and frontend/admin output hooks. For a first enqueue example, see [frontend and admin assets](./integrations.md#assets). For Vite module tags, see [asset bundling](./assets.md).
+`ws_resources()` resolves `WpStarter\Wordpress\Dependency\ResourceManager`. It bridges application assets to WordPress script/style handles, dependency ordering, and frontend/admin output hooks. For a first enqueue example, see [frontend and admin assets](./integrations.md#assets). For Vite URLs, module scripts, and the development client, see [Vite with the Resource Manager](./assets.md#wordpress-output).
 
 ## Queue and register resources {#queue-and-register}
 
