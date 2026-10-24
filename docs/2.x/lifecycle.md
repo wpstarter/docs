@@ -14,7 +14,7 @@ WordPress loads `main.php`, which requires the root `autoload.php` and creates `
 
 Its early bootstrap runs through `ws_loaded`, normally on `muplugins_loaded` or immediately if that action has already fired. Early bootstrap loads environment, configuration, exception handling, and facades. At `plugins_loaded:1`, the starter triggers `ws_boot`, bootstraps providers, then triggers `ws_booted`.
 
-After configured providers have been registered, the framework registers its settings provider if no provider extending it is present. The settings service therefore needs no application provider declaration; its behavior comes from `config/setting.php`.
+After configured providers have been registered, the framework registers its settings provider if no provider extending it is present. The settings service therefore needs no application provider declaration; its behavior comes from the `settings` array in `config/wordpress.php` (`wordpress.settings.*`).
 
 Providers can register WordPress callbacks during bootstrap. They should not assume that the main query or all plugins' later initialization is complete.
 

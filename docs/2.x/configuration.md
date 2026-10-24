@@ -32,7 +32,7 @@ return [
 
 WordPress loads before WpStarter, so constants defined in `wp-config.php` are available. Some skeleton configs already do this for database credentials.
 
-Use `ws_config('app.name')` in application code. Persistent user-editable plugin settings belong in WordPress options through `ws_setting()`, which is registered automatically. `config/setting.php` controls the option key, automatic saving, and queue restarts; see [settings](./integrations.md#settings).
+Use `ws_config('app.name')` in application code. Persistent user-editable plugin settings belong in WordPress options through `ws_setting()`, which is registered automatically. The `settings` array in `config/wordpress.php` controls the option key, automatic saving, and queue restarts through `wordpress.settings.*`; see [settings](./integrations.md#settings).
 
 ## Database, authentication, and mail {#wordpress-services}
 

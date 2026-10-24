@@ -106,15 +106,17 @@ If URL routes use `->hook(...)`, clear the URL route cache and leave it disabled
 
 ## Move settings configuration {#settings-configuration}
 
-Framework 2.2.6 automatically registers the settings provider. Skeleton 2.2.7 configures it through `config/setting.php` instead of supplying `App\Providers\SettingServiceProvider`.
+Framework 2.2.6 automatically registers the settings provider. Framework 2.2.7 reads its configuration from `wordpress.settings.*`, and the current skeleton supplies a `settings` array in `config/wordpress.php` instead of `App\Providers\SettingServiceProvider`.
 
 When adopting this setup:
 
-- Set `option_key` to the exact key returned by your existing provider's `getOptionKey()`. Preserving the key keeps the same stored settings.
-- Move `$autoSave` and `$autoRestartQueue` values to `autosave` and `restart_queue`. The framework now reads these configuration keys instead of those provider properties.
+- Set `wordpress.settings.option_key` to the exact key returned by your existing provider's `getOptionKey()`. Preserving the key keeps the same stored settings.
+- Move `$autoSave` and `$autoRestartQueue` values to `wordpress.settings.autosave` and `wordpress.settings.restart_queue`. The framework now reads these configuration keys instead of those provider properties.
 - After migrating any additional custom behavior, remove the application settings provider and its registration from `bootstrap/providers.php` or `config/app.php`, wherever it was declared.
 
-A custom provider extending `WpStarter\Wordpress\Setting\SettingServiceProvider` can remain registered when needed; the framework detects it and skips the default provider. Such a provider can override `getOptionKey()`, `isAutosave()`, or `isRestartQueue()` for custom behavior. See [settings configuration](./integrations.md#settings) for the defaults and API.
+If you already use `config/setting.php`, move its array into the `settings` entry of `config/wordpress.php`, preserving all three values, then remove the old file. Update application reads of `setting.option_key`, `setting.autosave`, and `setting.restart_queue` to their `wordpress.settings.*` equivalents. The framework does not fall back to the old keys; leaving them in place uses the defaults instead, which can select a different option or re-enable automatic saving and queue restarts. Clear cached configuration with `php artisan config:clear` after the move, and rebuild it if your deployment uses a configuration cache.
+
+A custom provider extending `WpStarter\Wordpress\Setting\SettingServiceProvider` can remain registered when needed; the framework detects it and skips the default provider. Such a provider can override `getOptionKey()`, `isAutosave()`, or `isRestartQueue()` for custom behavior. See [settings configuration](./integrations.md#settings) for the configuration array, defaults, and API. This configuration move does not require migrating stored WordPress options when `option_key` stays the same.
 
 ## Check application-specific compatibility {#application-compatibility}
 

@@ -8,18 +8,20 @@
 
 Settings are available through `ws_setting()` without creating or registering an application settings provider. The framework automatically registers `WpStarter\Wordpress\Setting\SettingServiceProvider` after application providers have been registered, unless a provider extending that class is already present.
 
-Configure settings in the skeleton's `config/setting.php`:
+Configure settings under `settings` in the skeleton's `config/wordpress.php`:
 
 ```php
 <?php
 return [
-    'option_key' => 'ws_settings',
-    'autosave' => true,
-    'restart_queue' => true,
+    'settings' => [
+        'option_key' => 'ws_settings',
+        'autosave' => true,
+        'restart_queue' => true,
+    ],
 ];
 ```
 
-These are also the framework defaults when the configuration file is absent. Choose an application-specific `option_key` before storing settings. Changing the key later selects another WordPress option; it does not migrate existing data.
+These are also the framework defaults when the configuration file is absent. The full configuration keys are `wordpress.settings.option_key`, `wordpress.settings.autosave`, and `wordpress.settings.restart_queue`; for example, read the option key with `ws_config('wordpress.settings.option_key', 'ws_settings')`. Choose an application-specific `option_key` before storing settings. Changing the key later selects another WordPress option; it does not migrate existing data.
 
 The repository supports dotted keys:
 
@@ -32,9 +34,9 @@ ws_setting()->save();
 
 `ws_setting($key, $default)` reads a value. Passing an array sets values in memory; calling with no arguments returns the repository. It also supports `get()`, `set()`, `has()`, and array access.
 
-With `setting.autosave` enabled, changes are saved at WordPress `shutdown` if the settings repository has been resolved. Call `save()` explicitly when persistence must happen before returning, as in the admin form example. Settings are stored together in the configured option; `save($autoload = false)` calls `update_option()`.
+With `wordpress.settings.autosave` enabled, changes are saved at WordPress `shutdown` if the settings repository has been resolved. Call `save()` explicitly when persistence must happen before returning, as in the admin form example. Settings are stored together in the configured option; `save($autoload = false)` calls `update_option()`.
 
-With `setting.restart_queue` enabled, the provider listens for updates to that option, reloads the repository, and calls `queue:restart`. Set either configuration flag to `false` to disable its behavior. Queue workers retain their own in-memory state, so a restart is useful when settings change.
+With `wordpress.settings.restart_queue` enabled, the provider listens for updates to that option, reloads the repository, and calls `queue:restart`. Set either configuration flag to `false` to disable its behavior. Queue workers retain their own in-memory state, so a restart is useful when settings change.
 
 Remove settings with `forget()`. Deletions mark the repository as changed and are persisted by `save()` or the automatic shutdown save:
 
