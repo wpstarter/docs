@@ -1,4 +1,4 @@
-- [What must stay private](#private-files)
+- [Protect the codebase and serve public assets](#private-files)
 - [Nginx](#nginx)
 - [Apache](#apache)
 - [Verify the deployed rules](#verify-access)
@@ -6,19 +6,21 @@
 - [Use a private PHP environment file](#php-environment-file)
 - [Move or rename the dotenv file](#custom-dotenv-path)
 
-HTTP requests enter through WordPress; the application's own directory should expose only its intended public assets.
+WpStarter is normally installed inside the WordPress web root, where application files can be reached through URLs unless the web server restricts access. The rules below deliberately block direct HTTP access to the entire application directory, with one exception: `public`.
 
-::: warning Public directory
-Files in `public` can be accessed directly from the Internet. Keep sensitive files such as `access.json`, credentials, tokens, and private configuration outside this directory.
+Use `public` for CSS, JavaScript, images, fonts, and other files that browsers need to download. WordPress continues to load the application through PHP; the access rules protect its files from direct URL requests.
+
+::: warning Keep sensitive files outside public
+`public` is intentionally excluded from the protection rules so its files can be accessed from the Internet. Do not put sensitive files such as `access.json`, credentials, tokens, or private configuration there.
 :::
 
-## What must stay private {#private-files}
+## Protect the codebase and serve public assets {#private-files}
 
-Block direct HTTP access to the application's `.env` files and backups, `app`, `bootstrap`, `config`, `database`, `resources`, `storage`, `vendor`, Composer files, and PHP entrypoints. `bootstrap/cache/config.php` contains resolved configuration and can contain secrets even after `.env` is removed. Logs, sessions, repository metadata, and deployment archives also belong outside public access.
+Blocking the application directory protects `.env`, source code, configuration, dependencies, logs, sessions, and generated caches together. For example, `bootstrap/cache/config.php` can contain secrets even after `.env` is removed. Keep all of these outside the `public` exception.
 
 The skeleton supplies Apache `.htaccess` files. Nginx does not read them, so add the Nginx rule below to protect the application directory.
 
-Deploy only browser-facing files under `public`. Never put secrets, PHP configuration, database dumps, or backups there. Disable `APP_DEBUG` and `APP_DEBUG_EXTERNAL` in production, keep secrets out of Git and build artifacts, and give the web process only the filesystem permissions it needs. WpStarter still needs write access to its runtime `storage` and `bootstrap/cache` directories.
+Disable `APP_DEBUG` and `APP_DEBUG_EXTERNAL` in production, keep secrets out of Git and build artifacts, and give the web process only the filesystem permissions it needs. WpStarter still needs write access to its runtime `storage` and `bootstrap/cache` directories.
 
 ## Nginx {#nginx}
 
@@ -32,7 +34,7 @@ location ~ ^/wp-content/plugins/example-plugin(?=/|$)(?!/public(?:/|$)) {
 
 Replace `/wp-content/plugins/example-plugin` with the application's URL path, without a trailing slash. For a WordPress-root installation at `/wpstarter`, use `/wpstarter`. Include any WordPress URL subdirectory in the path, and escape regex metacharacters such as `.` if they occur in the directory name.
 
-The rule returns 403 for the application directory and everything outside its `public` directory. Requests under `public/` continue through the site's existing file-serving configuration, with no extension allowlist. Only put files intended for direct URL access there.
+The rule returns 403 for the application directory and everything outside its `public` directory. The exception lets requests under `public/` continue through the site's existing file-serving configuration.
 
 Replace old WpStarter locations rather than keeping conflicting rules. An exact `location` or a matching `^~` prefix can bypass this regex; the rule must also precede other matching regex locations. See [Nginx location selection](https://nginx.org/en/docs/http/ngx_http_core_module.html#location).
 
@@ -66,7 +68,7 @@ Define wsbasedir "/var/www/wordpress/wp-content/plugins/example-plugin"
 UnDefine wsbasedir
 ```
 
-`AllowOverride None` makes the virtual-host rules authoritative instead of combining them with the bundled `.htaccess` files. The public directory remains an asset directory; publish no private files there. For a WordPress-root installation, change only the `Define wsbasedir` value. Check the complete configuration for other authorization sections and public-directory handlers.
+The first block denies direct access to the application directory; the second explicitly allows its `public` subdirectory. `AllowOverride None` makes these virtual-host rules authoritative instead of combining them with the bundled `.htaccess` files. For a WordPress-root installation, change only the `Define wsbasedir` value. Check the complete configuration for other authorization sections and public-directory handlers.
 
 If your host only allows `.htaccess`, ask it to enable the appropriate overrides. For Apache 2.4, you can replace the application-root access directives with `Require all denied`, and replace the public-directory access directive with `Require all granted`. Replace the legacy directives rather than mixing both syntaxes. See [Apache's access-control guidance](https://httpd.apache.org/docs/2.4/en/howto/access.html) and [override configuration](https://httpd.apache.org/docs/2.4/mod/core.html#allowoverride).
 
@@ -74,7 +76,7 @@ Validate with your platform's `apachectl configtest` (or `httpd -t`) before relo
 
 ## Verify the deployed rules {#verify-access}
 
-Set the public application URL once, then test the deployed origin with GET requests that discard the response body:
+Set the application's base URL once, then test the deployed origin with GET requests that discard the response body:
 
 ```shell
 wsbaseurl='https://example.com/wp-content/plugins/example-plugin'
