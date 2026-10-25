@@ -8,7 +8,7 @@ Use the paths matching your [installation layout](./installation.md), including 
 
 Renaming dotenv text to `.env.php` or `env.php` does **not** make the loader execute PHP. `loadEnvironmentFrom()` changes a filename; the loader still parses dotenv syntax. A dotenv file with a `.php` extension can expose its raw text if requested through PHP, so changing its extension is not protection.
 
-To use real PHP, keep the file outside the document root and load it after Composer autoload but before application/environment bootstrap. For example, create `/etc/wpstarter/example-plugin/env.php` readable by the PHP and CLI users:
+To use real PHP, keep the file outside the document root and load it after Composer autoload but before application/environment bootstrap. For example, create `/etc/wpstarter/env.php` readable by the PHP and CLI users:
 
 ```php
 <?php
@@ -27,7 +27,7 @@ Create `bootstrap/load-custom.php` in the application with this loader:
 
 ```php
 <?php
-$privateEnvironment = require '/etc/wpstarter/example-plugin/env.php';
+$privateEnvironment = require '/etc/wpstarter/env.php';
 $environmentRepository = \WpStarter\Support\Env::getRepository();
 
 foreach ($privateEnvironment as $name => $value) {
@@ -63,7 +63,7 @@ Alternatively, require a private PHP array directly from the relevant `config/*.
 To keep dotenv outside the document root, change `return Application::configure(...)` to `$app = Application::configure(...)` in `bootstrap/app.php`, keeping the existing builder chain through `->create()`. Then add:
 
 ```php
-$app->useEnvironmentPath('/etc/wpstarter/example-plugin');
+$app->useEnvironmentPath('/etc/wpstarter');
 $app->loadEnvironmentFrom('application.env');
 
 return $app;

@@ -1,49 +1,53 @@
 # Installation
 
-- [Install the plugin skeleton](#installation-via-composer)
-- [Load from a WordPress-root directory](#wordpress-root-installation)
+- [Install WpStarter in the WordPress root](#installation-via-composer)
+- [Load WpStarter as a must-use plugin](#wordpress-root-installation)
 - [Initial configuration](#initial-configuration)
 - [Try the supplied examples](#try-the-supplied-examples)
 
 WpStarter runs an application inside WordPress. Its framework uses Laravel-style APIs under the `WpStarter` namespace and integrates routing, views, authentication, database access, and mail with WordPress. These docs focus on that integration. For shared framework concepts, use the Laravel 12.x documentation.
 
-## Install the plugin skeleton {#installation-via-composer}
+## Install WpStarter in the WordPress root {#installation-via-composer}
 
-Install into your WordPress plugins directory:
+The recommended setup is to install WpStarter in a `wpstarter` directory at the root of your existing WordPress installation, beside `wp-load.php`, and load it through a must-use plugin loader.
 
 ```shell
-cd /path/to/wordpress/wp-content/plugins
-composer create-project "wpstarter/wpstarter:2.*" example-plugin
+cd /path/to/wordpress
+composer create-project "wpstarter/wpstarter:2.*" wpstarter
 ```
 
 This installs the plugin skeleton together with `wpstarter/framework` and its dependencies.
 
 Use PHP 8.2 or later with the extensions required by Composer. The install scripts create `.env` and generate `APP_KEY`.
 
-Update the plugin header in `main.php` for your application, then activate it in WordPress. The project must be able to load an installed WordPress instance. Its CLI bootstrap searches for `wp-load.php` relative to the project and supports the plugin-directory and WordPress-root layouts described here.
+The application entrypoint is now `/path/to/wordpress/wpstarter/main.php`. Its CLI bootstrap searches for `wp-load.php` relative to the project.
 
-Run application commands from the plugin directory:
+## Load WpStarter as a must-use plugin {#wordpress-root-installation}
+
+Create the `wp-content/mu-plugins` directory if it does not exist, then create `wp-content/mu-plugins/wpstarter.php` with this loader:
+
+```php
+<?php
+/**
+ * Plugin Name: WpStarter
+ */
+require_once ABSPATH . 'wpstarter/main.php';
+```
+
+WordPress automatically loads this file as a must-use plugin; no activation in the WordPress admin is needed. Keep the loader directly inside `mu-plugins` so WordPress discovers it. The application itself stays in the WordPress-root `wpstarter` directory.
+
+The entrypoint guards against loading another copy through `__WS_FILE__`; plan for one WpStarter application entrypoint per WordPress installation with this skeleton.
+
+Run application commands from the `wpstarter` directory:
 
 ```shell
-cd example-plugin
+cd /path/to/wordpress/wpstarter
 php artisan list
 ```
 
 The plugin bootstrap loads WordPress before Composer's autoloader and the application. This is different from a standalone Laravel project; do not configure the web server to use this skeleton as an independent Laravel `public/index.php` application.
 
-## Load from a WordPress-root directory {#wordpress-root-installation}
-
-You can also place the project beside `wp-load.php`, for example `/path/to/wordpress/example-plugin`. Create `wp-content/mu-plugins/example-plugin.php`:
-
-```php
-<?php
-/**
- * Plugin Name: Example Application
- */
-require ABSPATH.'example-plugin/main.php';
-```
-
-This loads the application as a must-use plugin. The entrypoint guards against loading another copy through `__WS_FILE__`; plan for one WpStarter application entrypoint per WordPress installation with this skeleton.
+Installing in `wp-content/plugins/wpstarter` and activating `main.php` as a regular plugin is also possible, but is not recommended. In particular, [conditional plugin loading](./plugins-loader.md) needs the must-use setup to filter regular plugins before they load.
 
 ## Initial configuration {#initial-configuration}
 

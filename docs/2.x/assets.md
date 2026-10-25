@@ -128,10 +128,10 @@ Set `app.asset_url` to the plugin's public URL. The supplied configuration defau
 
 ```dotenv
 APP_URL=https://example.com
-ASSET_URL=https://example.com/wp-content/plugins/example-plugin/public
+ASSET_URL=https://example.com/wpstarter/public
 ```
 
-The Vite plugin reads this environment value to generate its production base path. PHP's fallback in `config/app.php` is not available to the Node build. Adjust the URL for your installation, including a WordPress subdirectory or WordPress-root application layout. Build with the target public URL so imported chunks, fonts, and images also resolve correctly. `MIX_URL` applies to Mix; it does not configure Vite.
+The Vite plugin reads this environment value to generate its production base path. PHP's fallback in `config/app.php` is not available to the Node build. Adjust the URL for your installation, including any WordPress URL subdirectory; the example assumes the recommended WordPress-root `wpstarter` layout. Build with the target public URL so imported chunks, fonts, and images also resolve correctly. `MIX_URL` applies to Mix; it does not configure Vite.
 
 ## WordPress theme and admin integration {#wordpress-output}
 

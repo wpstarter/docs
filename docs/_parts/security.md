@@ -27,12 +27,12 @@ Disable `APP_DEBUG` and `APP_DEBUG_EXTERNAL` in production, keep secrets out of 
 Inside the existing WordPress `server` block, add this rule **before generic PHP and static-file regex locations**:
 
 ```nginx
-location ~ ^/wp-content/plugins/example-plugin(?=/|$)(?!/public(?:/|$)) {
+location ~ ^/wpstarter(?=/|$)(?!/public(?:/|$)) {
     deny all;
 }
 ```
 
-Replace `/wp-content/plugins/example-plugin` with the application's URL path, without a trailing slash. For a WordPress-root installation at `/wpstarter`, use `/wpstarter`. Include any WordPress URL subdirectory in the path, and escape regex metacharacters such as `.` if they occur in the directory name.
+The example assumes the application is installed in the WordPress-root `wpstarter` directory. Replace `/wpstarter` if your application uses a different URL path, without a trailing slash. Include any WordPress URL subdirectory in the path, and escape regex metacharacters such as `.` if they occur in the directory name.
 
 The rule returns 403 for the application directory and everything outside its `public` directory. The exception lets requests under `public/` continue through the site's existing file-serving configuration.
 
@@ -51,7 +51,7 @@ The bundled `.htaccess` files require the server to honor overrides and support 
 In the Apache 2.4 virtual-host configuration, set the application's **absolute filesystem directory** once with [`Define`](https://httpd.apache.org/docs/2.4/mod/core.html#define). These paths refer to directories on disk, not URLs:
 
 ```apache
-Define wsbasedir "/var/www/wordpress/wp-content/plugins/example-plugin"
+Define wsbasedir "/var/www/wordpress/wpstarter"
 
 <Directory "${wsbasedir}">
     AllowOverride None
@@ -68,7 +68,7 @@ Define wsbasedir "/var/www/wordpress/wp-content/plugins/example-plugin"
 UnDefine wsbasedir
 ```
 
-The first block denies direct access to the application directory; the second explicitly allows its `public` subdirectory. `AllowOverride None` makes these virtual-host rules authoritative instead of combining them with the bundled `.htaccess` files. For a WordPress-root installation, change only the `Define wsbasedir` value. Check the complete configuration for other authorization sections and public-directory handlers.
+The first block denies direct access to the application directory; the second explicitly allows its `public` subdirectory. `AllowOverride None` makes these virtual-host rules authoritative instead of combining them with the bundled `.htaccess` files. If your application is installed elsewhere, change the `Define wsbasedir` value to its absolute filesystem directory. Check the complete configuration for other authorization sections and public-directory handlers.
 
 If your host only allows `.htaccess`, ask it to enable the appropriate overrides. For Apache 2.4, you can replace the application-root access directives with `Require all denied`, and replace the public-directory access directive with `Require all granted`. Replace the legacy directives rather than mixing both syntaxes. See [Apache's access-control guidance](https://httpd.apache.org/docs/2.4/en/howto/access.html) and [override configuration](https://httpd.apache.org/docs/2.4/mod/core.html#allowoverride).
 
@@ -79,7 +79,7 @@ Validate with your platform's `apachectl configtest` (or `httpd -t`) before relo
 Set the application's base URL once, then test the deployed origin with GET requests that discard the response body:
 
 ```shell
-wsbaseurl='https://example.com/wp-content/plugins/example-plugin'
+wsbaseurl='https://example.com/wpstarter'
 
 for private_path in .env bootstrap/cache/config.php vendor/autoload.php; do
     curl -sS -o /dev/null -w '%{http_code}\n' "$wsbaseurl/$private_path"
@@ -88,7 +88,7 @@ done
 
 Private URLs must return 403 or 404 without exposing their contents or executing application PHP. Also check `.env.production`, `.env.bak`, `env.php`, and a real log file outside `public`. Check an **existing** deployed asset under `public/` returns 200, and that the normal WordPress frontend, admin, and WpStarter routes still work. A 404 for a nonexistent test file alone does not prove the access rules are effective.
 
-For a WordPress-root application, set `wsbaseurl='https://example.com/example-plugin'`. These commands use a POSIX shell; on Windows, run them in WSL or Git Bash, or test each URL with `curl.exe -o NUL`. Repeat the checks after web-server changes and for an origin exposed separately from a CDN. If secrets were previously served, remove access and rotate the exposed credentials; removing the URL does not invalidate downloaded copies.
+Adjust `wsbaseurl` for your domain and any WordPress URL subdirectory. These commands use a POSIX shell; on Windows, run them in WSL or Git Bash, or test each URL with `curl.exe -o NUL`. Repeat the checks after web-server changes and for an origin exposed separately from a CDN. If secrets were previously served, remove access and rotate the exposed credentials; removing the URL does not invalidate downloaded copies.
 
 ## Run without a .env file {#without-dotenv}
 
