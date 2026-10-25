@@ -101,7 +101,7 @@ php artisan config:cache
 
 WordPress-derived values such as table prefixes, URLs, and locale can become fixed in the cache. Do not copy a cache built against a different site's database or URL. Use `php artisan config:clear` when those values change.
 
-`route:cache` caches frontend URL routes only. `AppServiceProvider::boot()` loads `routes/wp.php` independently of `withRouting()` in `bootstrap/app.php`, so shortcode routes are registered even when URL routes are cached. Admin routes are registered separately by their own provider. Shortcode and admin routes remain runtime collections; their WordPress matching is not part of the compiled URL cache.
+`route:cache` caches frontend URL routes only. The skeleton passes `routes/wp.php` to the `wp` argument of `withRouting()` in `bootstrap/app.php`. The WordPress application builder registers a separate loading callback with the WordPress routing provider, which runs when the application has booted even when URL routes are cached. Admin routes are registered separately by their own provider. Shortcode and admin routes remain runtime collections; their WordPress matching is not part of the compiled URL cache.
 
 The compiled URL matcher bypasses the WordPress hook validator. Keep URL route caching disabled when controllers rely on `->hook(...)` to run after WordPress initialization; see [routing hook limitations](./routing.md#dispatch-at-a-wordpress-hook).
 

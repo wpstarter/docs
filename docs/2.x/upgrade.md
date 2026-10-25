@@ -74,18 +74,27 @@ If your application already extends `WpStarter\Wordpress\Auth\User`, no change i
 
 ## Keep WordPress routes loaded {#route-registration}
 
-The URL route cache covers the normal HTTP router, not the shortcode or admin routers. The current skeleton loads URL routes through `withRouting()` in `bootstrap/app.php` and shortcode routes from `AppServiceProvider::boot()`:
+The URL route cache covers the normal HTTP router, not the shortcode or admin routers. The current skeleton uses the WordPress application builder to load both URL routes and shortcode routes in `bootstrap/app.php`:
 
 ```php
-use WpStarter\Wordpress\Facades\Route as WpRoute;
+use WpStarter\Wordpress\Application;
 
-// Inside App\Providers\AppServiceProvider::boot():
-WpRoute::middleware('web')->group(ws_base_path('routes/wp.php'));
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+        wp: __DIR__.'/../routes/wp.php',
+    )
+    // Keep the application's withMiddleware() and withExceptions() configuration.
+    ->create();
 ```
 
-Keep this registration outside `withRouting()`, including its `then` callback, so it also runs with cached URL routes. Keep `AppServiceProvider` registered in `bootstrap/providers.php`.
+The `wp` argument accepts a path or an array of paths and applies the `web` middleware group. The WordPress routing provider loads these files when the application has booted, independently of the URL route cache. Use `WpStarter\Wordpress\Application` for this builder API and update the framework if the installed builder does not yet support `wp`.
 
-If retaining an older `RouteServiceProvider`, load shortcode routes outside `$this->routes(...)`:
+When adopting `wp:`, remove the previous shortcode route loading from `AppServiceProvider::boot()` or `RouteServiceProvider` to avoid registering the routes twice. Preserve any custom route group attributes when moving them. Keep `AppServiceProvider` registered for its other responsibilities, such as shortcode components and translations. Do not move shortcode loading into `then` or the URL routing callback: those callbacks are skipped when URL routes are cached.
+
+If retaining an older `RouteServiceProvider` instead of adopting the builder's `wp` argument, load shortcode routes outside `$this->routes(...)`:
 
 ```php
 use WpStarter\Support\Facades\Route;

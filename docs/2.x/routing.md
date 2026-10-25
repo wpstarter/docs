@@ -19,7 +19,9 @@ WpStarter has three routers. Choose according to how WordPress should participat
 | `routes/wp.php` | `WpStarter\Wordpress\Facades\Route` | Shortcode tag in the queried singular post's content and HTTP method | `web` |
 | `app/Admin/routes/admin.php` | `WpStarter\Wordpress\Admin\Facades\Route` | Registered WordPress admin screen and HTTP method | `admin` |
 
-`withRouting()` in `bootstrap/app.php` loads `routes/web.php` and registers the `/up` health endpoint. `App\Providers\AppServiceProvider::boot()` loads `routes/wp.php`, and `App\Admin\AdminServiceProvider` loads the admin file.
+`withRouting()` in `bootstrap/app.php` loads `routes/web.php` through its `web` argument and `routes/wp.php` through its `wp` argument, and registers the `/up` health endpoint. `App\Admin\AdminServiceProvider` loads the admin file.
+
+Use `WpStarter\Wordpress\Application::configure()` to obtain the WordPress application builder. Its `wp` argument accepts a route file path or an array of paths and applies the `web` middleware group to each file. The WordPress routing provider loads these routes when the application has booted, independently of the URL route cache. See [cache and deployment](./configuration.md#configuration-caching).
 
 URL routes run first, normally at `init:1`. If the URL router cannot match a route, the WordPress kernel schedules shortcode routing at `template_redirect:1`, after WordPress has resolved its main query. If neither router matches, WordPress continues with its normal template. A matched route returning a 404 response does not trigger this fallback.
 
@@ -46,6 +48,7 @@ The skeleton does not include an API route file. To add one, create `routes/api.
     api: __DIR__.'/../routes/api.php',
     commands: __DIR__.'/../routes/console.php',
     health: '/up',
+    wp: __DIR__.'/../routes/wp.php',
 )
 ```
 

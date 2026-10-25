@@ -10,7 +10,7 @@
 
 WordPress loads `main.php`, which requires the root `autoload.php` and creates `WordpressStarter` unless WordPress is installing or another entrypoint has already defined `__WS_FILE__`. `WordpressStarter::boot()` checks for pre-rendered maintenance output, creates the application from `bootstrap/app.php`, and selects the framework's WordPress HTTP or console kernel. For web requests, it captures and binds the request before early bootstrap.
 
-`bootstrap/app.php` uses `Application::configure()` to configure URL routes, console commands, frontend middleware, and exceptions. Application providers are listed in `bootstrap/providers.php`; the admin provider binds its separate kernel.
+`bootstrap/app.php` uses `WpStarter\Wordpress\Application::configure()` to configure URL routes, shortcode routes through `withRouting(wp: ...)`, console commands, frontend middleware, and exceptions. The WordPress routing provider loads shortcode routes when the application has booted, including when URL routes are cached. Application providers are listed in `bootstrap/providers.php`; the admin provider binds its separate kernel.
 
 Its early bootstrap runs through `ws_loaded`, normally on `muplugins_loaded` or immediately if that action has already fired. Early bootstrap loads environment, configuration, exception handling, and facades. At `plugins_loaded:1`, the starter triggers `ws_boot`, bootstraps providers, then triggers `ws_booted`.
 

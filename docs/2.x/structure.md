@@ -10,9 +10,9 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `bootstrap/providers.php` | Registers application service providers |
 | `routes/console.php` | Artisan closure commands |
 | `app/PluginsLoader.php` | Optional early rules for [conditional plugin loading](./plugins-loader.md); create this file when needed |
-| `bootstrap/app.php` | Creates the WordPress application with `Application::configure()`; configures URL/console routes, frontend middleware, and exception rendering |
+| `bootstrap/app.php` | Creates the WordPress application with `Application::configure()`; configures URL, shortcode, and console routes, frontend middleware, and exception rendering |
 | `routes/web.php` | URL routes loaded by `withRouting()` with the `web` middleware group |
-| `routes/wp.php` | WordPress shortcode routes |
+| `routes/wp.php` | WordPress shortcode routes loaded by `withRouting(wp: ...)` with the `web` middleware group |
 | `app/Http/Controllers` | Frontend controller actions |
 | `app/Admin/AdminServiceProvider.php` | Admin kernel binding, route group, and view namespace |
 | `app/Admin/Kernel.php` | Independent admin middleware configuration |
@@ -21,7 +21,7 @@ The skeleton keeps Laravel-style application folders but enters through WordPres
 | `app/Admin/resources/views` | Views under `admin::`, including the application layout |
 | `app/View/Components` (optional) | Create this directory for WordPress response components with optional `boot()` / `mount()` |
 | `app/View/Shortcodes` | Components registered with the shortcode manager |
-| `app/Providers/AppServiceProvider.php` | Loads shortcode routes, registers the sample shortcode, and loads the text domain |
+| `app/Providers/AppServiceProvider.php` | Registers the sample shortcode and loads the text domain |
 | `config/wordpress.php` | WordPress integration configuration; `settings` controls the option key, automatic save, and queue restart behavior |
 | `config` | Framework and WordPress service configuration |
 | `resources/views` / `resources/lang` | Frontend Blade templates and translation resources |
